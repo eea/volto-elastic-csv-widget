@@ -67,6 +67,7 @@ const WidgetModalEditor = ({ value: propValue, onChange, onClose }) => {
     setQuery(e.target.value);
   };
 
+  console.log('results', results);
   return (
     <Modal open={true} size="fullscreen" className="chart-editor-modal">
       <Modal.Content scrolling>
