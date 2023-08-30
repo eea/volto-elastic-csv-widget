@@ -2,7 +2,7 @@ pipeline {
   agent any
 
   environment {
-        GIT_NAME = "volto-addon-template"
+        GIT_NAME = "volto-elastic-csv-widget"
         NAMESPACE = "@eeacms"
         SONARQUBE_TAGS = "volto.eea.europa.eu"
         DEPENDENCIES = ""
@@ -222,6 +222,7 @@ pipeline {
       }
     }
 
+
     stage('Pull Request') {
       when {
         not {
@@ -266,3 +267,4 @@ pipeline {
     }
   }
 }
+
