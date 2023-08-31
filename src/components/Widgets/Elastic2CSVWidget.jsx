@@ -4,68 +4,38 @@ import { map } from 'lodash';
 import axios from 'axios';
 
 import { FormFieldWrapper } from '@plone/volto/components';
+import { createAggregatedPayload } from '../../helpers';
 
-const createPayload = (query) => {
-  return {
-    query: {
-      function_score: {
-        query: {
-          bool: {
-            must: [
-              {
-                multi_match: {
-                  query,
-                  minimum_should_match: '75%',
-                  fields: [
-                    'title^2',
-                    'subject^1.5',
-                    'description^1.5',
-                    'all_fields_for_freetext',
-                  ],
-                },
-              },
-            ],
-          },
-        },
-        functions: [
-          { exp: { 'issued.date': { offset: '30d', scale: '1800d' } } },
-        ],
-        score_mode: 'sum',
-      },
-    },
-    aggs: {},
-    size: 10,
-    index: 'data_searchui',
-    source: { exclude: ['embedding'] },
-    track_total_hits: true,
-  };
+export const payloadConfig = {
+  //objectProvides: 'Page',
+  cluster_name: 'wise-marine',
+  index: 'wisetest_searchui',
 };
 
 const WidgetModalEditor = ({ value: propValue, onChange, onClose }) => {
   const [value, setValue] = useState(propValue);
   const [results, setResults] = useState([]);
-  const [query, setQuery] = useState('');
 
   useEffect(() => {
     setValue(propValue);
   }, [propValue]);
 
   useEffect(() => {
-    if (query) {
-      axios
-        .post('/marine/_es/globalsearch/_search', createPayload(query))
-        .then((response) => {
-          setResults(response.data.hits.hits);
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    }
-  }, [query]);
+    axios
+      .post(
+        '/marine/_es/globalsearch/_search',
+        createAggregatedPayload(payloadConfig),
+      )
+      .then((response) => {
+        console.log('full resp', response);
+        setResults(response.data.hits.hits);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, []);
 
-  const handleQueryChange = (e) => {
-    setQuery(e.target.value);
-  };
+  const handleQueryChange = (e) => {};
 
   console.log('results', results);
   return (
