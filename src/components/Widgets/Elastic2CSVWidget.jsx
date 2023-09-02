@@ -7,11 +7,13 @@ import { FormFieldWrapper, InlineForm } from '@plone/volto/components';
 import { createAggregatedPayload } from '../../helpers';
 
 import PanelsSchema from './panelsSchema';
+import DataView from '../DataView/DataView';
 
 const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
   const [results, setResults] = useState({});
   const [intValue, setIntValue] = React.useState(value);
   const [isLoading, setIsLoading] = useState(false);
+  const [hits, setHits] = useState([]);
 
   useEffect(() => {
     const payloadConfig = {
@@ -26,6 +28,9 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
         setIsLoading(false);
 
         setResults(response.data);
+        if (response?.data?.hits?.hits) {
+          setHits(response.data.hits.hits);
+        }
       })
       .catch((error) => {
         setIsLoading(false);
@@ -34,13 +39,19 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
       });
   }, [intValue.index, intValue.content_type, intValue.website]);
 
-  let schema = PanelsSchema({ data: intValue, aggs: results?.aggregations });
+  let schema = PanelsSchema({
+    data: intValue,
+    aggs: results?.aggregations,
+    hits: results?.hits,
+  });
 
   const handleChangeField = (val, id) => {
     setIntValue({ ...intValue, [id]: val });
   };
 
-  // console.log('results', results);
+  // console.log('hits', hits);
+  // console.log(intValue?.fields, 'value');
+
   return (
     <Modal open={true} size="fullscreen" className="chart-editor-modal">
       <Modal.Content scrolling>
@@ -62,12 +73,7 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
           </Grid.Column>
           <Grid.Column mobile={12} tablet={12} computer={7}>
             <div className="dataview-container">
-              {isLoading ? 'Loading new data ... ' : ''}
-              {results?.hits?.hits &&
-                results.hits.hits.length > 0 &&
-                results.hits.hits.map((item, index) => {
-                  return <div key={index}>_id : {item._id}</div>;
-                })}
+              <DataView hits={hits} fields={intValue?.fields} />
             </div>
           </Grid.Column>
         </Grid>

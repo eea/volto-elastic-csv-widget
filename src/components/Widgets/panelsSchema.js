@@ -1,5 +1,47 @@
-export default ({ data = {}, aggs = {} }) => {
-  console.log(data, ' vals in schema');
+function extractUniqueFields(data) {
+  let fieldsSet = new Set();
+
+  if (data?.hits && data.hits.length > 0) {
+    data.hits.forEach((hit) => {
+      for (let key in hit._source) {
+        fieldsSet.add(key);
+      }
+    });
+  }
+
+  let result = [];
+  fieldsSet.forEach((field) => {
+    result.push([field, field]);
+  });
+
+  return result;
+}
+
+const fieldSchema = (hits) => {
+  return {
+    title: 'Field',
+
+    fieldsets: [
+      {
+        id: 'default',
+        title: 'Default',
+        fields: ['field'],
+      },
+    ],
+
+    properties: {
+      field: {
+        title: 'Field',
+        choices: extractUniqueFields(hits),
+      },
+    },
+
+    required: [''],
+  };
+};
+
+export default ({ data = {}, aggs = {}, hits = {} }) => {
+  //console.log(extractUniqueFields(hits), ' vals in schema');
   const websites = aggs?.cluster_name?.buckets
     ? aggs?.cluster_name?.buckets.map((item, i) => [item.key, item.key])
     : [];
@@ -14,7 +56,10 @@ export default ({ data = {}, aggs = {} }) => {
       {
         id: 'default',
         title: 'Elastic editor ',
-        fields: ['index', ...(data?.index ? ['content_type', 'website'] : [])],
+        fields: [
+          'index',
+          ...(data?.index ? ['content_type', 'website', 'fields'] : []),
+        ],
       },
     ],
     properties: {
@@ -30,6 +75,11 @@ export default ({ data = {}, aggs = {} }) => {
       website: {
         title: 'Website',
         choices: websites,
+      },
+      fields: {
+        title: 'Fields',
+        widget: 'object_list',
+        schema: fieldSchema(hits),
       },
     },
     required: [],
