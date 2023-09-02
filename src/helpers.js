@@ -1,5 +1,74 @@
 const createAggregatedPayload = (payloadConfig) => {
-  const { objectProvides = '', cluster_name = '', index = '' } = payloadConfig;
+  const {
+    objectProvides = '',
+    cluster_name = '',
+    index = '',
+    //size = 10000,
+    size = 10,
+  } = payloadConfig;
+
+  let mustQueries = [
+    { match_all: {} },
+    {
+      constant_score: {
+        filter: {
+          bool: {
+            should: [
+              {
+                bool: {
+                  must_not: {
+                    exists: {
+                      field: 'expires',
+                    },
+                  },
+                },
+              },
+              {
+                range: {
+                  expires: {
+                    gte: '2023-08-31T13:32:08Z',
+                  },
+                },
+              },
+            ],
+          },
+        },
+      },
+    },
+    {
+      bool: {
+        should: [
+          {
+            range: {
+              readingTime: {},
+            },
+          },
+        ],
+        minimum_should_match: 1,
+      },
+    },
+    {
+      term: { hasWorkflowState: 'published' },
+    },
+  ];
+
+  if (cluster_name) {
+    mustQueries.push({
+      bool: {
+        should: [{ term: { cluster_name: cluster_name } }],
+        minimum_should_match: 1,
+      },
+    });
+  }
+
+  if (objectProvides) {
+    mustQueries.push({
+      bool: {
+        should: [{ term: { objectProvides: objectProvides } }],
+        minimum_should_match: 1,
+      },
+    });
+  }
 
   return {
     index,
@@ -7,67 +76,11 @@ const createAggregatedPayload = (payloadConfig) => {
       function_score: {
         query: {
           bool: {
-            must: [
-              { match_all: {} },
-              {
-                constant_score: {
-                  filter: {
-                    bool: {
-                      should: [
-                        {
-                          bool: {
-                            must_not: {
-                              exists: {
-                                field: 'expires',
-                              },
-                            },
-                          },
-                        },
-                        {
-                          range: {
-                            expires: {
-                              gte: '2023-08-31T13:32:08Z',
-                            },
-                          },
-                        },
-                      ],
-                    },
-                  },
-                },
-              },
-              {
-                bool: {
-                  should: [{ term: { cluster_name: cluster_name } }],
-                  minimum_should_match: 1,
-                },
-              },
-              // {
-              //   bool: {
-              //     should: [{ term: { objectProvides: objectProvides } }],
-              //     minimum_should_match: 1,
-              //   },
-              // },
-              {
-                bool: {
-                  should: [
-                    {
-                      range: {
-                        readingTime: {},
-                      },
-                    },
-                  ],
-                  minimum_should_match: 1,
-                },
-              },
-              {
-                term: { hasWorkflowState: 'published' },
-              },
-            ],
+            must: mustQueries,
           },
         },
       },
     },
-
     aggs: {
       objectProvides: {
         terms: {
@@ -82,8 +95,7 @@ const createAggregatedPayload = (payloadConfig) => {
         },
       },
     },
-
-    size: 10000,
+    size: size,
     source: { exclude: ['embedding'] },
     track_total_hits: true,
   };

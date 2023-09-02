@@ -3,60 +3,84 @@ import { Button, Modal, Grid, Label } from 'semantic-ui-react';
 import { map } from 'lodash';
 import axios from 'axios';
 
-import { FormFieldWrapper } from '@plone/volto/components';
+import { FormFieldWrapper, InlineForm } from '@plone/volto/components';
 import { createAggregatedPayload } from '../../helpers';
 
-export const payloadConfig = {
-  //objectProvides: 'Page',
-  cluster_name: 'wise-marine',
-  index: 'wisetest_searchui',
-};
+import PanelsSchema from './panelsSchema';
 
-const WidgetModalEditor = ({ value: propValue, onChange, onClose }) => {
-  const [value, setValue] = useState(propValue);
-  const [results, setResults] = useState([]);
+const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
+  const [results, setResults] = useState({});
+  const [intValue, setIntValue] = React.useState(value);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    setValue(propValue);
-  }, [propValue]);
-
-  useEffect(() => {
+    const payloadConfig = {
+      objectProvides: intValue.content_type,
+      cluster_name: intValue.website,
+      index: intValue.index,
+    };
+    setIsLoading(true);
     axios
-      .post(
-        '/marine/_es/globalsearch/_search',
-        createAggregatedPayload(payloadConfig),
-      )
+      .post('/_es/globalsearch/_search', createAggregatedPayload(payloadConfig))
       .then((response) => {
-        console.log('full resp', response);
-        setResults(response.data.hits.hits);
+        setIsLoading(false);
+
+        setResults(response.data);
       })
       .catch((error) => {
+        setIsLoading(false);
+
         console.error(error);
       });
-  }, []);
+  }, [intValue.index, intValue.content_type, intValue.website]);
 
-  const handleQueryChange = (e) => {};
+  let schema = PanelsSchema({ data: intValue, aggs: results?.aggregations });
 
-  console.log('results', results);
+  const handleChangeField = (val, id) => {
+    setIntValue({ ...intValue, [id]: val });
+  };
+
+  // console.log('results', results);
   return (
     <Modal open={true} size="fullscreen" className="chart-editor-modal">
       <Modal.Content scrolling>
-        {/* insert content here */}
-        <p>es databuilder widget</p>
-        <input onChange={handleQueryChange} />
-
-        <h2>Results</h2>
-        {results &&
-          results.length > 0 &&
-          results.map((item, index) => {
-            return <div key={index}>_id : {item._id}</div>;
-          })}
+        <Grid stackable reversed="mobile vertically tablet vertically">
+          <Grid.Column
+            mobile={12}
+            tablet={12}
+            computer={5}
+            className="map-editor-column"
+          >
+            <InlineForm
+              block={block}
+              schema={schema}
+              onChangeField={(id, value) => {
+                handleChangeField(value, id);
+              }}
+              formData={intValue}
+            />
+          </Grid.Column>
+          <Grid.Column mobile={12} tablet={12} computer={7}>
+            <div className="dataview-container">
+              {isLoading ? 'Loading new data ... ' : ''}
+              {results?.hits?.hits &&
+                results.hits.hits.length > 0 &&
+                results.hits.hits.map((item, index) => {
+                  return <div key={index}>_id : {item._id}</div>;
+                })}
+            </div>
+          </Grid.Column>
+        </Grid>
       </Modal.Content>
       <Modal.Actions>
         <Grid>
           <Grid.Row>
             <Grid.Column computer={12} tablet={12} verticalAlign="middle">
-              <Button primary floated="right" onClick={() => onChange(value)}>
+              <Button
+                primary
+                floated="right"
+                onClick={() => onChange(intValue)}
+              >
                 Apply changes
               </Button>
               <Button floated="right" onClick={onClose}>
@@ -85,9 +109,9 @@ const Elastic2CSVWidget = ({
     setValue(propValue);
   }, [propValue]);
 
-  const handleModalChange = (value) => {
+  const handleModalChange = (val) => {
     onChange(id, {
-      value,
+      ...val,
     });
     setShowEditor(false);
   };
@@ -114,7 +138,7 @@ const Elastic2CSVWidget = ({
       {showEditor ? (
         <WidgetModalEditor
           value={value}
-          onChange={handleModalChange}
+          onChange={(val) => handleModalChange(val)}
           onClose={() => setShowEditor(false)}
         />
       ) : (
