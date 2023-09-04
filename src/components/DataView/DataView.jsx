@@ -35,7 +35,7 @@ const DataView = (props) => {
     setTableData(newData);
     setColumns(Object.keys(newData || {}));
   }, [props.hits, props.fields]);
-  console.log(tableData, 'Table data');
+  // console.log(tableData, 'Table data');
 
   return (
     <Container className="elastic-connector-view">

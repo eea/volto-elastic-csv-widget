@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import { Button, Modal, Grid, Label } from 'semantic-ui-react';
 import { map } from 'lodash';
@@ -35,7 +36,7 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
       .catch((error) => {
         setIsLoading(false);
 
-        console.error(error);
+        // console.error(error);
       });
   }, [intValue.index, intValue.content_type, intValue.website]);
 
