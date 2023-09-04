@@ -4,7 +4,7 @@ const createAggregatedPayload = (payloadConfig) => {
     cluster_name = '',
     index = '',
     //size = 10000,
-    size = 3,
+    size = 100,
   } = payloadConfig;
 
   let mustQueries = [

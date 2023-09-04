@@ -22,7 +22,7 @@ const DataView = (props) => {
   const [tableData, setTableData] = React.useState({});
   const [columns, setColumns] = React.useState([]);
 
-  const row_size = columns.length;
+  const row_size = props.hits.length;
 
   React.useEffect(() => {
     const newData =
@@ -35,6 +35,7 @@ const DataView = (props) => {
     setTableData(newData);
     setColumns(Object.keys(newData || {}));
   }, [props.hits, props.fields]);
+  console.log(tableData, 'Table data');
 
   return (
     <Container className="elastic-connector-view">
