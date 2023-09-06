@@ -3,8 +3,8 @@ const createAggregatedPayload = (payloadConfig) => {
     objectProvides = '',
     cluster_name = '',
     index = '',
-    //size = 10000,
-    size = 100,
+    size = 10000,
+    //size = 100,
   } = payloadConfig;
 
   let mustQueries = [
@@ -101,4 +101,18 @@ const createAggregatedPayload = (payloadConfig) => {
   };
 };
 
-export { createAggregatedPayload };
+const buildTable = (items, fields) => {
+  let table = {};
+
+  fields.forEach((fieldObj) => {
+    // Get the field name from the field object.
+    let fieldName = fieldObj.field;
+
+    // For each field, extract values from all items.
+    table[fieldName] = items.map((item) => item._source[fieldName]);
+  });
+
+  return table;
+};
+
+export { createAggregatedPayload, buildTable };

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import { Button, Modal, Grid, Label } from 'semantic-ui-react';
@@ -5,22 +6,30 @@ import { map } from 'lodash';
 import axios from 'axios';
 
 import { FormFieldWrapper, InlineForm } from '@plone/volto/components';
-import { createAggregatedPayload } from '../../helpers';
+import { buildTable, createAggregatedPayload } from '../../helpers';
 
 import PanelsSchema from './panelsSchema';
 import DataView from '../DataView/DataView';
 
 const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
   const [results, setResults] = useState({});
-  const [intValue, setIntValue] = React.useState(value);
+  const [intValue, setIntValue] = React.useState(
+    value?.formValue ? value.formValue : {},
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [hits, setHits] = useState([]);
 
+  const [tableData, setTableData] = React.useState(value?.tableData);
+
+  const { index = '', fields = [], website = '', content_type = '' } = intValue;
+
+  const row_size = hits.length;
+
   useEffect(() => {
     const payloadConfig = {
-      objectProvides: intValue.content_type,
-      cluster_name: intValue.website,
-      index: intValue.index,
+      objectProvides: content_type,
+      cluster_name: website,
+      index: index,
     };
     setIsLoading(true);
     axios
@@ -39,11 +48,17 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
       })
       .catch((error) => {
         setIsLoading(false);
-
-        // console.error(error);
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [intValue.index, intValue.content_type, intValue.website]);
+  }, [content_type, website, index]);
+
+  React.useEffect(() => {
+    const newData =
+      hits && hits.length > 0 && intValue?.fields && intValue?.fields.length > 0
+        ? buildTable(hits, intValue?.fields)
+        : {};
+    setTableData(newData);
+  }, [hits, fields]);
 
   let schema = PanelsSchema({
     data: intValue,
@@ -76,7 +91,7 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
           </Grid.Column>
           <Grid.Column mobile={12} tablet={12} computer={7}>
             <div className="dataview-container">
-              <DataView hits={hits} fields={intValue?.fields} />
+              {!isLoading ? <DataView tableData={tableData} /> : 'Loading...'}
             </div>
           </Grid.Column>
         </Grid>
@@ -88,7 +103,7 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
               <Button
                 primary
                 floated="right"
-                onClick={() => onChange(intValue)}
+                onClick={() => onChange({ formValue: intValue, tableData })}
               >
                 Apply changes
               </Button>
