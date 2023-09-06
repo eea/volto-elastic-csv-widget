@@ -35,7 +35,6 @@ const DataView = (props) => {
     setTableData(newData);
     setColumns(Object.keys(newData || {}));
   }, [props.hits, props.fields]);
-  // console.log(tableData, 'Table data');
 
   return (
     <Container className="elastic-connector-view">
@@ -46,7 +45,7 @@ const DataView = (props) => {
               <Table.Row>
                 {columns.map((column) => (
                   <Table.HeaderCell key={column}>
-                    {column ? column : ''}
+                    {column && column !== 'undefined' ? column : ''}
                   </Table.HeaderCell>
                 ))}
               </Table.Row>

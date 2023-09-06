@@ -58,7 +58,7 @@ export default ({ data = {}, aggs = {}, hits = {} }) => {
         title: 'Elastic editor ',
         fields: [
           'index',
-          ...(data?.index ? ['content_type', 'website', 'fields'] : []),
+          ...(data?.index ? ['website', 'content_type', 'fields'] : []),
         ],
       },
     ],
@@ -67,14 +67,14 @@ export default ({ data = {}, aggs = {}, hits = {} }) => {
         title: 'Index',
         choices: [['wisetest_searchui', 'wisetest_searchui']],
       },
+      website: {
+        title: 'Website',
+        choices: websites,
+      },
       content_type: {
         title: 'Content-type',
         description: 'Choose the content-type you wish to create data with',
         choices: contentTypes,
-      },
-      website: {
-        title: 'Website',
-        choices: websites,
       },
       fields: {
         title: 'Fields',

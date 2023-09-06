@@ -31,6 +31,10 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
         setResults(response.data);
         if (response?.data?.hits?.hits) {
           setHits(response.data.hits.hits);
+          setIntValue({
+            ...intValue,
+            hits: response.data.hits.hits,
+          });
         }
       })
       .catch((error) => {
@@ -38,6 +42,7 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
 
         // console.error(error);
       });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [intValue.index, intValue.content_type, intValue.website]);
 
   let schema = PanelsSchema({
@@ -49,9 +54,6 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
   const handleChangeField = (val, id) => {
     setIntValue({ ...intValue, [id]: val });
   };
-
-  // console.log('hits', hits);
-  // console.log(intValue?.fields, 'value');
 
   return (
     <Modal open={true} size="fullscreen" className="chart-editor-modal">
