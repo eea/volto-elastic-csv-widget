@@ -16,7 +16,7 @@ describe('DataView', () => {
   };
 
   it('should render the component', () => {
-    const { container } = render(<DataView item={mockDataTable} />);
+    const { container } = render(<DataView tableData={mockDataTable} />);
     expect(
       container.querySelector('.elastic-connector-view'),
     ).toBeInTheDocument();
