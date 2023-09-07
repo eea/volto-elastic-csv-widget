@@ -17,6 +17,8 @@ import {
 import PanelsSchema from './panelsSchema';
 import DataView from '../DataView/DataView';
 
+import './styles.less';
+
 const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
   const [results, setResults] = useState({});
   const [formValue, setFormValue] = React.useState(
@@ -27,6 +29,7 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
   const [aggBuckets, setAggBuckets] = useState([]);
 
   const [tableData, setTableData] = React.useState(value?.tableData);
+  const [emptyFields, setEmptyFields] = React.useState([]);
 
   const {
     index = '',
@@ -144,6 +147,28 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
     setFormValue({ ...formValue, [id]: val });
   };
 
+  const getEmptyFields = () => {
+    let emptyFields = [];
+
+    // Check for empty string fields
+    if (!index) emptyFields.push('index');
+    if (!website) emptyFields.push('website');
+    if (!content_type) emptyFields.push('content_type');
+
+    // Conditionally check for agg_field or fields based on use_aggs
+    if (use_aggs) {
+      if (!agg_field) emptyFields.push('agg_field');
+    } else {
+      if (fields.length === 0) emptyFields.push('fields');
+    }
+
+    return emptyFields;
+  };
+
+  React.useEffect(() => {
+    setEmptyFields(getEmptyFields());
+  }, [index, website, content_type, use_aggs, agg_field]);
+
   return (
     <Modal open={true} size="fullscreen" className="chart-editor-modal">
       <Modal.Content scrolling>
@@ -165,7 +190,37 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
           </Grid.Column>
           <Grid.Column mobile={12} tablet={12} computer={7}>
             <div className="dataview-container">
-              {!isLoading ? <DataView tableData={tableData} /> : 'Loading...'}
+              {isLoading && (
+                <p className="elastic-data-loader">
+                  <span>L</span>
+                  <span>o</span>
+                  <span>a</span>
+                  <span>d</span>
+                  <span>i</span>
+                  <span>n</span>
+                  <span>g</span>
+                  <span> </span>
+                  <span>d</span>
+                  <span>a</span>
+                  <span>t</span>
+                  <span>a</span>
+                  <span>.</span>
+                  <span>.</span>
+                  <span>.</span>
+                </p>
+              )}
+              {emptyFields.length === 0 ? (
+                <>{!isLoading && <DataView tableData={tableData} />}</>
+              ) : (
+                <div>
+                  <h4>Please complete the following fields:</h4>
+                  <ul>
+                    {emptyFields.map((field, index) => (
+                      <li key={index}>{field}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           </Grid.Column>
         </Grid>

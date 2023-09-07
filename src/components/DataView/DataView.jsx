@@ -41,7 +41,7 @@ const DataView = ({ tableData }) => {
             </Table.Body>
           </Table>
         ) : (
-          <p>No data</p>
+          <p className="no-data-message">No compatible data</p>
         )}
       </div>
     </Container>
