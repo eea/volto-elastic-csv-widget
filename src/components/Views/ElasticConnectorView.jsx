@@ -1,8 +1,10 @@
 import React from 'react';
+import DataView from '../DataView/DataView';
 
 const ElasticConnectorView = (props) => {
-  // console.log(props, 'le props in view');
-  return <p>I'm the elastic connector view, sir!</p>;
+  const tableData = props?.content.elastic_csv_widget?.tableData;
+
+  return <>{tableData && <DataView tableData={tableData} />}</>;
 };
 
 export default ElasticConnectorView;
