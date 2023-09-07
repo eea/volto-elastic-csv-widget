@@ -5,6 +5,8 @@ import { Button, Modal, Grid, Label } from 'semantic-ui-react';
 import { map } from 'lodash';
 import axios from 'axios';
 
+import isEqual from 'lodash/isEqual';
+
 import { FormFieldWrapper, InlineForm } from '@plone/volto/components';
 import {
   buildTableFromFields,
@@ -17,7 +19,7 @@ import DataView from '../DataView/DataView';
 
 const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
   const [results, setResults] = useState({});
-  const [intValue, setIntValue] = React.useState(
+  const [formValue, setFormValue] = React.useState(
     value?.formValue ? value.formValue : {},
   );
   const [isLoading, setIsLoading] = useState(false);
@@ -33,9 +35,11 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
     content_type = '',
     use_aggs = false,
     agg_field = '',
-  } = intValue;
+  } = formValue;
 
   const row_size = hits.length;
+
+  const previousPayloadConfigRef = React.useRef(null);
 
   useEffect(() => {
     const payloadConfig = {
@@ -45,20 +49,37 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
       agg_field,
       use_aggs,
     };
+
+    if (isEqual(payloadConfig, previousPayloadConfigRef.current)) {
+      return; // Payload hasn't changed, so we don't make a new request.
+    }
+
+    previousPayloadConfigRef.current = payloadConfig;
+
+    const cancelTokenSource = axios.CancelToken.source(); // Create a cancel token source
     setIsLoading(true);
+
     axios
-      .post('/_es/globalsearch/_search', createAggregatedPayload(payloadConfig))
+      .post(
+        '/_es/globalsearch/_search',
+        createAggregatedPayload(payloadConfig),
+        {
+          cancelToken: cancelTokenSource.token,
+        },
+      )
       .then((response) => {
         setIsLoading(false);
 
         setResults(response.data);
+
         if (response?.data?.hits?.hits) {
           setHits(response.data.hits.hits);
-          setIntValue({
-            ...intValue,
+          setFormValue((prevFormValue) => ({
+            ...prevFormValue,
             hits: response.data.hits.hits,
-          });
+          }));
         }
+
         if (
           response.data.aggregations &&
           agg_field &&
@@ -69,38 +90,58 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
         }
       })
       .catch((error) => {
-        setIsLoading(false);
+        if (!axios.isCancel(error)) {
+          setIsLoading(false);
+        }
       });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [content_type, website, index]);
 
-  React.useEffect(() => {
+    return () => {
+      // Cancel the request if the component is unmounted or the effect runs again
+      cancelTokenSource.cancel();
+    };
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [content_type, website, index, use_aggs, agg_field]);
+
+  useEffect(() => {
+    let nextTableData = {};
+
     if (use_aggs && agg_field) {
       const dataFromAggs =
         aggBuckets && aggBuckets.length > 0
           ? buildTableFromAggs(aggBuckets, agg_field)
           : {};
-      setTableData(dataFromAggs);
-    } else {
-      const dataFromHits =
-        hits &&
-        hits.length > 0 &&
-        intValue?.fields &&
-        intValue?.fields.length > 0
-          ? buildTableFromFields(hits, intValue?.fields)
-          : {};
-      setTableData(dataFromHits);
+
+      if (Object.keys(dataFromAggs).length > 0) {
+        nextTableData = dataFromAggs;
+      }
+    } else if (
+      hits &&
+      hits.length > 0 &&
+      fields &&
+      fields.length > 0 &&
+      !use_aggs
+    ) {
+      const dataFromHits = buildTableFromFields(hits, fields);
+
+      if (Object.keys(dataFromHits).length > 0) {
+        nextTableData = dataFromHits;
+      }
     }
-  }, [hits, fields, aggBuckets, agg_field, use_aggs]);
+
+    if (!isEqual(nextTableData, tableData)) {
+      setTableData(nextTableData);
+    }
+  }, [hits, fields, aggBuckets, agg_field, use_aggs, tableData]);
 
   let schema = PanelsSchema({
-    data: intValue,
+    data: formValue,
     aggs: results?.aggregations,
     hits: results?.hits,
   });
 
   const handleChangeField = (val, id) => {
-    setIntValue({ ...intValue, [id]: val });
+    setFormValue({ ...formValue, [id]: val });
   };
 
   return (
@@ -119,7 +160,7 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
               onChangeField={(id, value) => {
                 handleChangeField(value, id);
               }}
-              formData={intValue}
+              formData={formValue}
             />
           </Grid.Column>
           <Grid.Column mobile={12} tablet={12} computer={7}>
@@ -136,7 +177,7 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
               <Button
                 primary
                 floated="right"
-                onClick={() => onChange({ formValue: intValue, tableData })}
+                onClick={() => onChange({ formValue: formValue, tableData })}
               >
                 Apply changes
               </Button>
@@ -191,7 +232,6 @@ const Elastic2CSVWidget = ({
         </Button>
       </div>
       {description && <p className="help">{description}</p>}
-      {/* TODO: make sure to insert a data table view.. like the view */}
       {showEditor ? (
         <WidgetModalEditor
           value={value}

@@ -1,0 +1,50 @@
+@keyframes colorChange {
+  0%, 100% {
+      color: #00519d;
+  }
+  50% {
+      color: #5ac5f1;
+  }
+}
+
+@keyframes typingEffect {
+  from {
+      width: 0;
+  }
+  to {
+      width: 100%;
+  }
+}
+
+@keyframes blink-caret {
+  from, to {
+      border-color: transparent;
+  }
+  50% {
+      border-color: #00519d;
+  }
+}
+
+@keyframes pulsate {
+  0%, 100% {
+      text-shadow: none;
+  }
+  50% {
+      text-shadow: 0 0 5px #5ac5f1, 0 0 10px #5ac5f1;
+  }
+}
+
+.elastic-data-loader {
+  font-size: 23px;
+  border-right: 0.2em solid #00519d;
+  white-space: nowrap;
+  overflow: hidden;
+  display: inline-block;
+  animation: typingEffect 4s steps(20, end), blink-caret 0.75s step-end infinite, colorChange 3s infinite;
+}
+
+.elastic-data-loader span:nth-child(3),
+.elastic-data-loader span:nth-child(7),
+.elastic-data-loader span:nth-child(10) {
+  animation: pulsate 1s infinite;
+}
