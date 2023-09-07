@@ -6,7 +6,11 @@ import { map } from 'lodash';
 import axios from 'axios';
 
 import { FormFieldWrapper, InlineForm } from '@plone/volto/components';
-import { buildTable, createAggregatedPayload } from '../../helpers';
+import {
+  buildTableFromFields,
+  buildTableFromAggs,
+  createAggregatedPayload,
+} from '../../helpers';
 
 import PanelsSchema from './panelsSchema';
 import DataView from '../DataView/DataView';
@@ -18,10 +22,18 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
   );
   const [isLoading, setIsLoading] = useState(false);
   const [hits, setHits] = useState([]);
+  const [aggBuckets, setAggBuckets] = useState([]);
 
   const [tableData, setTableData] = React.useState(value?.tableData);
 
-  const { index = '', fields = [], website = '', content_type = '' } = intValue;
+  const {
+    index = '',
+    fields = [],
+    website = '',
+    content_type = '',
+    use_aggs = false,
+    agg_field = '',
+  } = intValue;
 
   const row_size = hits.length;
 
@@ -30,6 +42,8 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
       objectProvides: content_type,
       cluster_name: website,
       index: index,
+      agg_field,
+      use_aggs,
     };
     setIsLoading(true);
     axios
@@ -45,6 +59,14 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
             hits: response.data.hits.hits,
           });
         }
+        if (
+          response.data.aggregations &&
+          agg_field &&
+          use_aggs &&
+          response.data.aggregations[agg_field]?.buckets
+        ) {
+          setAggBuckets(response.data.aggregations[`${agg_field}`].buckets);
+        }
       })
       .catch((error) => {
         setIsLoading(false);
@@ -53,12 +75,23 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
   }, [content_type, website, index]);
 
   React.useEffect(() => {
-    const newData =
-      hits && hits.length > 0 && intValue?.fields && intValue?.fields.length > 0
-        ? buildTable(hits, intValue?.fields)
-        : {};
-    setTableData(newData);
-  }, [hits, fields]);
+    if (use_aggs && agg_field) {
+      const dataFromAggs =
+        aggBuckets && aggBuckets.length > 0
+          ? buildTableFromAggs(aggBuckets, agg_field)
+          : {};
+      setTableData(dataFromAggs);
+    } else {
+      const dataFromHits =
+        hits &&
+        hits.length > 0 &&
+        intValue?.fields &&
+        intValue?.fields.length > 0
+          ? buildTableFromFields(hits, intValue?.fields)
+          : {};
+      setTableData(dataFromHits);
+    }
+  }, [hits, fields, aggBuckets, agg_field, use_aggs]);
 
   let schema = PanelsSchema({
     data: intValue,

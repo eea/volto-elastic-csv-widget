@@ -41,7 +41,6 @@ const fieldSchema = (hits) => {
 };
 
 export default ({ data = {}, aggs = {}, hits = {} }) => {
-  //console.log(extractUniqueFields(hits), ' vals in schema');
   const websites = aggs?.cluster_name?.buckets
     ? aggs?.cluster_name?.buckets.map((item, i) => [item.key, item.key])
     : [];
@@ -58,7 +57,8 @@ export default ({ data = {}, aggs = {}, hits = {} }) => {
         title: 'Elastic editor ',
         fields: [
           'index',
-          ...(data?.index ? ['website', 'content_type', 'fields'] : []),
+          ...(data?.index ? ['website', 'content_type', 'use_aggs'] : []),
+          ...(data?.use_aggs ? ['agg_field'] : ['fields']),
         ],
       },
     ],
@@ -71,10 +71,19 @@ export default ({ data = {}, aggs = {}, hits = {} }) => {
         title: 'Website',
         choices: websites,
       },
+      use_aggs: {
+        title: 'Use aggregations',
+        description: 'Aggregate data based on field values',
+        type: 'boolean',
+      },
       content_type: {
         title: 'Content-type',
         description: 'Choose the content-type you wish to create data with',
         choices: contentTypes,
+      },
+      agg_field: {
+        title: 'Aggregation field',
+        choices: extractUniqueFields(hits),
       },
       fields: {
         title: 'Fields',
