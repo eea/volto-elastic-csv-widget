@@ -60,9 +60,9 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
       agg_field,
       use_aggs,
     };
-    const es_endpoint = toPublicURL('/_es/globalsearch/_search/');
+    // const es_endpoint = toPublicURL('/_es/globalsearch/_search/');
+    const es_endpoint = `${process.env.RAZZLE_PROXY_QA_DSN_globalsearch}/_search/`;
 
-    // Save the payloadConfig and endpoint to the reqConfig in the widget field
     setElasticQueryConfig({
       es_endpoint, // save this in config
       payloadConfig: createAggregatedPayload(payloadConfig),

@@ -5,19 +5,10 @@ import './styles.less';
 
 const ElasticConnectorConfigView = ({ content, tableData }) => {
   const title = content?.title;
-  const connectorConfig = content?.elastic_csv_widget?.formValue;
 
   return (
     <Container className="elastic-connector-config">
       <h2>{title}</h2>
-      <h4>Index: {connectorConfig?.index || 'Not selected'}</h4>
-      <h4>Website: {connectorConfig?.website || 'Not selected'}</h4>
-      <h4>Content type: {connectorConfig?.content_type || 'Not selected'}</h4>
-      {Object.keys(tableData).length > 0 && (
-        <>
-          <h4>Use aggregations: {connectorConfig?.use_aggs ? 'Yes' : 'No'}</h4>
-        </>
-      )}
     </Container>
   );
 };
