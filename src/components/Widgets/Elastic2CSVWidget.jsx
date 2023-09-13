@@ -8,6 +8,9 @@ import axios from 'axios';
 import isEqual from 'lodash/isEqual';
 
 import { FormFieldWrapper, InlineForm } from '@plone/volto/components';
+
+import { toPublicURL } from '@plone/volto/helpers';
+
 import {
   buildTableFromFields,
   buildTableFromAggs,
@@ -23,6 +26,9 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
   const [results, setResults] = useState({});
   const [formValue, setFormValue] = React.useState(
     value?.formValue ? value.formValue : {},
+  );
+  const [elasticQueryConfig, setElasticQueryConfig] = React.useState(
+    value?.elasticQueryConfig ? value.elasticQueryConfig : {},
   );
   const [isLoading, setIsLoading] = useState(false);
   const [hits, setHits] = useState([]);
@@ -42,6 +48,8 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
 
   const row_size = hits.length;
 
+  console.log(value, 'value');
+
   const previousPayloadConfigRef = React.useRef(null);
 
   useEffect(() => {
@@ -52,56 +60,13 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
       agg_field,
       use_aggs,
     };
+    const es_endpoint = toPublicURL('/_es/globalsearch/_search/');
 
-    if (isEqual(payloadConfig, previousPayloadConfigRef.current)) {
-      return; // Payload hasn't changed, so we don't make a new request.
-    }
-
-    previousPayloadConfigRef.current = payloadConfig;
-
-    const cancelTokenSource = axios.CancelToken.source(); // Create a cancel token source
-    setIsLoading(true);
-
-    axios
-      .post(
-        '/_es/globalsearch/_search',
-        createAggregatedPayload(payloadConfig),
-        {
-          cancelToken: cancelTokenSource.token,
-        },
-      )
-      .then((response) => {
-        setIsLoading(false);
-
-        setResults(response.data);
-
-        if (response?.data?.hits?.hits) {
-          setHits(response.data.hits.hits);
-          setFormValue((prevFormValue) => ({
-            ...prevFormValue,
-            hits: response.data.hits.hits,
-          }));
-        }
-
-        if (
-          response.data.aggregations &&
-          agg_field &&
-          use_aggs &&
-          response.data.aggregations[agg_field]?.buckets
-        ) {
-          setAggBuckets(response.data.aggregations[`${agg_field}`].buckets);
-        }
-      })
-      .catch((error) => {
-        if (!axios.isCancel(error)) {
-          setIsLoading(false);
-        }
-      });
-
-    return () => {
-      // Cancel the request if the component is unmounted or the effect runs again
-      cancelTokenSource.cancel();
-    };
+    // Save the payloadConfig and endpoint to the reqConfig in the widget field
+    setElasticQueryConfig({
+      es_endpoint, // save this in config
+      payloadConfig: createAggregatedPayload(payloadConfig),
+    });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [content_type, website, index, use_aggs, agg_field]);
@@ -232,7 +197,13 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
               <Button
                 primary
                 floated="right"
-                onClick={() => onChange({ formValue: formValue, tableData })}
+                onClick={() =>
+                  onChange({
+                    formValue: formValue,
+                    tableData,
+                    elasticQueryConfig,
+                  })
+                }
               >
                 Apply changes
               </Button>

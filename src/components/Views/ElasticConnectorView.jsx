@@ -7,16 +7,6 @@ const ElasticConnectorConfigView = ({ content, tableData }) => {
   const title = content?.title;
   const connectorConfig = content?.elastic_csv_widget?.formValue;
 
-  // const not_agg_fields = connectorConfig?.fields.map((field) => field.field);
-
-  // const fields = connectorConfig?.use_aggs
-  //   ? [
-  //       `${connectorConfig?.agg_field}_count`,
-  //       `${connectorConfig?.agg_field}_values`,
-  //     ]
-  //   : not_agg_fields;
-
-  // console.log(fields, 'fields');
   return (
     <Container className="elastic-connector-config">
       <h2>{title}</h2>
@@ -26,7 +16,6 @@ const ElasticConnectorConfigView = ({ content, tableData }) => {
       {Object.keys(tableData).length > 0 && (
         <>
           <h4>Use aggregations: {connectorConfig?.use_aggs ? 'Yes' : 'No'}</h4>
-          {/* <h4>Fields: {fields.map((field) => field).join(', ')}</h4> */}
         </>
       )}
     </Container>

@@ -1,0 +1,1 @@
+export connectorDataReducer from './connectorData';
