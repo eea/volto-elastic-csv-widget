@@ -48,9 +48,9 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
 
   const row_size = hits.length;
 
-  console.log(value, 'value');
-
   const previousPayloadConfigRef = React.useRef(null);
+
+  const es_endpoint = `${process.env.RAZZLE_PROXY_QA_DSN_globalsearch}/_search/`;
 
   useEffect(() => {
     const payloadConfig = {
@@ -60,13 +60,69 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
       agg_field,
       use_aggs,
     };
-    // const es_endpoint = toPublicURL('/_es/globalsearch/_search/');
-    const es_endpoint = `${process.env.RAZZLE_PROXY_QA_DSN_globalsearch}/_search/`;
 
     setElasticQueryConfig({
-      es_endpoint, // save this in config
+      es_endpoint,
       payloadConfig: createAggregatedPayload(payloadConfig),
     });
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [content_type, website, index, use_aggs, agg_field]);
+
+  useEffect(() => {
+    const payloadConfig = {
+      objectProvides: content_type,
+      cluster_name: website,
+      index: index,
+      agg_field,
+      use_aggs,
+    };
+
+    if (isEqual(payloadConfig, previousPayloadConfigRef.current)) {
+      return; // Payload hasn't changed, so we don't make a new request.
+    }
+
+    previousPayloadConfigRef.current = payloadConfig;
+
+    const cancelTokenSource = axios.CancelToken.source(); // Create a cancel token source
+    setIsLoading(true);
+
+    axios
+      .post(es_endpoint, createAggregatedPayload(payloadConfig), {
+        cancelToken: cancelTokenSource.token,
+      })
+      .then((response) => {
+        setIsLoading(false);
+
+        setResults(response.data);
+
+        if (response?.data?.hits?.hits) {
+          setHits(response.data.hits.hits);
+          setFormValue((prevFormValue) => ({
+            ...prevFormValue,
+            hits: response.data.hits.hits,
+          }));
+        }
+
+        if (
+          response.data.aggregations &&
+          agg_field &&
+          use_aggs &&
+          response.data.aggregations[agg_field]?.buckets
+        ) {
+          setAggBuckets(response.data.aggregations[`${agg_field}`].buckets);
+        }
+      })
+      .catch((error) => {
+        if (!axios.isCancel(error)) {
+          setIsLoading(false);
+        }
+      });
+
+    return () => {
+      // Cancel the request if the component is unmounted or the effect runs again
+      cancelTokenSource.cancel();
+    };
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [content_type, website, index, use_aggs, agg_field]);
@@ -200,7 +256,6 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
                 onClick={() =>
                   onChange({
                     formValue: formValue,
-                    tableData,
                     elasticQueryConfig,
                   })
                 }
