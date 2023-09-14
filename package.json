@@ -68,5 +68,8 @@
   },
   "dependencies": {
     "@eeacms/volto-datablocks": "6.1.0"
-  }
+  },
+  "addons": [
+    "@eeacms/volto-datablocks"
+  ]
 }
