@@ -8,6 +8,9 @@ import axios from 'axios';
 import isEqual from 'lodash/isEqual';
 
 import { FormFieldWrapper, InlineForm } from '@plone/volto/components';
+
+import { toPublicURL } from '@plone/volto/helpers';
+
 import {
   buildTableFromFields,
   buildTableFromAggs,
@@ -23,6 +26,9 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
   const [results, setResults] = useState({});
   const [formValue, setFormValue] = React.useState(
     value?.formValue ? value.formValue : {},
+  );
+  const [elasticQueryConfig, setElasticQueryConfig] = React.useState(
+    value?.elasticQueryConfig ? value.elasticQueryConfig : {},
   );
   const [isLoading, setIsLoading] = useState(false);
   const [hits, setHits] = useState([]);
@@ -44,6 +50,25 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
 
   const previousPayloadConfigRef = React.useRef(null);
 
+  const es_endpoint = `${process.env.RAZZLE_PROXY_QA_DSN_globalsearch}/_search/`;
+
+  useEffect(() => {
+    const payloadConfig = {
+      objectProvides: content_type,
+      cluster_name: website,
+      index: index,
+      agg_field,
+      use_aggs,
+    };
+
+    setElasticQueryConfig({
+      es_endpoint,
+      payloadConfig: createAggregatedPayload(payloadConfig),
+    });
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [content_type, website, index, use_aggs, agg_field]);
+
   useEffect(() => {
     const payloadConfig = {
       objectProvides: content_type,
@@ -63,13 +88,9 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
     setIsLoading(true);
 
     axios
-      .post(
-        '/_es/globalsearch/_search',
-        createAggregatedPayload(payloadConfig),
-        {
-          cancelToken: cancelTokenSource.token,
-        },
-      )
+      .post(es_endpoint, createAggregatedPayload(payloadConfig), {
+        cancelToken: cancelTokenSource.token,
+      })
       .then((response) => {
         setIsLoading(false);
 
@@ -232,7 +253,12 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
               <Button
                 primary
                 floated="right"
-                onClick={() => onChange({ formValue: formValue, tableData })}
+                onClick={() =>
+                  onChange({
+                    formValue: formValue,
+                    elasticQueryConfig,
+                  })
+                }
               >
                 Apply changes
               </Button>

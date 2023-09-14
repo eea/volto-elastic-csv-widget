@@ -21,9 +21,9 @@
     "@plone/scripts": "*",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "cypress-fail-fast": "^5.0.1",
-    "md5": "^2.3.0",
     "husky": "*",
-    "lint-staged": "*"
+    "lint-staged": "*",
+    "md5": "^2.3.0"
   },
   "lint-staged": {
     "src/**/*.{js,jsx,ts,tsx,json}": [
@@ -65,5 +65,11 @@
     "cypress:run": "make cypress-run",
     "cypress:open": "make cypress-open",
     "prepare": "husky install"
-  }
+  },
+  "dependencies": {
+    "@eeacms/volto-datablocks": "6.1.0"
+  },
+  "addons": [
+    "@eeacms/volto-datablocks"
+  ]
 }
