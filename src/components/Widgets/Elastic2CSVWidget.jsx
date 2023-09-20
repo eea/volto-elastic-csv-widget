@@ -50,13 +50,13 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
 
   const previousPayloadConfigRef = React.useRef(null);
 
-  const es_endpoint = `${
-    process.env.RAZZLE_PROXY_QA_DSN_globalsearch
-      ? process.env.RAZZLE_PROXY_QA_DSN_globalsearch
-      : '_es/globalsearch'
-  }/_search/`;
-
   useEffect(() => {
+    const es_endpoint = `${
+      process.env.RAZZLE_PROXY_QA_DSN_globalsearch
+        ? process.env.RAZZLE_PROXY_QA_DSN_globalsearch
+        : '_es/globalsearch'
+    }/_search/`;
+
     const payloadConfig = {
       objectProvides: content_type,
       cluster_name: website,
@@ -69,18 +69,6 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
       es_endpoint,
       payloadConfig: createAggregatedPayload(payloadConfig),
     });
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [content_type, website, index, use_aggs, agg_field]);
-
-  useEffect(() => {
-    const payloadConfig = {
-      objectProvides: content_type,
-      cluster_name: website,
-      index: index,
-      agg_field,
-      use_aggs,
-    };
 
     if (isEqual(payloadConfig, previousPayloadConfigRef.current)) {
       return; // Payload hasn't changed, so we don't make a new request.
