@@ -50,7 +50,7 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
 
   const previousPayloadConfigRef = React.useRef(null);
 
-  const es_endpoint = `${process.env.RAZZLE_PROXY_QA_DSN_globalsearch}/_search/`;
+  const es_endpoint = `${process.env.RAZZLE_PROXY_QA_DSN_globalsearch ? process.env.RAZZLE_PROXY_QA_DSN_globalsearch : '_es/globalsearch'}/_search/`;
 
   useEffect(() => {
     const payloadConfig = {
