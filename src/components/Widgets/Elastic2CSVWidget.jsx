@@ -1,57 +1,194 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import { Button, Modal, Grid, Label } from 'semantic-ui-react';
 import { map } from 'lodash';
 import axios from 'axios';
 
+import isEqual from 'lodash/isEqual';
+
 import { FormFieldWrapper, InlineForm } from '@plone/volto/components';
-import { createAggregatedPayload } from '../../helpers';
+
+import { toPublicURL } from '@plone/volto/helpers';
+
+import {
+  buildTableFromFields,
+  buildTableFromAggs,
+  createAggregatedPayload,
+} from '../../helpers';
 
 import PanelsSchema from './panelsSchema';
 import DataView from '../DataView/DataView';
 
+import './styles.less';
+
 const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
   const [results, setResults] = useState({});
-  const [intValue, setIntValue] = React.useState(value);
+  const [formValue, setFormValue] = React.useState(
+    value?.formValue ? value.formValue : {},
+  );
+  const [elasticQueryConfig, setElasticQueryConfig] = React.useState(
+    value?.elasticQueryConfig ? value.elasticQueryConfig : {},
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [hits, setHits] = useState([]);
+  const [aggBuckets, setAggBuckets] = useState([]);
+
+  const [tableData, setTableData] = React.useState(value?.tableData);
+  const [emptyFields, setEmptyFields] = React.useState([]);
+
+  const {
+    index = '',
+    fields = [],
+    website = '',
+    content_type = '',
+    use_aggs = false,
+    agg_field = '',
+  } = formValue;
+
+  const row_size = hits.length;
+
+  const previousPayloadConfigRef = React.useRef(null);
+
+  const es_endpoint = `${process.env.RAZZLE_PROXY_QA_DSN_globalsearch}/_search/`;
 
   useEffect(() => {
     const payloadConfig = {
-      objectProvides: intValue.content_type,
-      cluster_name: intValue.website,
-      index: intValue.index,
+      objectProvides: content_type,
+      cluster_name: website,
+      index: index,
+      agg_field,
+      use_aggs,
     };
+
+    setElasticQueryConfig({
+      es_endpoint,
+      payloadConfig: createAggregatedPayload(payloadConfig),
+    });
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [content_type, website, index, use_aggs, agg_field]);
+
+  useEffect(() => {
+    const payloadConfig = {
+      objectProvides: content_type,
+      cluster_name: website,
+      index: index,
+      agg_field,
+      use_aggs,
+    };
+
+    if (isEqual(payloadConfig, previousPayloadConfigRef.current)) {
+      return; // Payload hasn't changed, so we don't make a new request.
+    }
+
+    previousPayloadConfigRef.current = payloadConfig;
+
+    const cancelTokenSource = axios.CancelToken.source(); // Create a cancel token source
     setIsLoading(true);
+
     axios
-      .post('/_es/globalsearch/_search', createAggregatedPayload(payloadConfig))
+      .post(es_endpoint, createAggregatedPayload(payloadConfig), {
+        cancelToken: cancelTokenSource.token,
+      })
       .then((response) => {
         setIsLoading(false);
 
         setResults(response.data);
+
         if (response?.data?.hits?.hits) {
           setHits(response.data.hits.hits);
+          setFormValue((prevFormValue) => ({
+            ...prevFormValue,
+            hits: response.data.hits.hits,
+          }));
+        }
+
+        if (
+          response.data.aggregations &&
+          agg_field &&
+          use_aggs &&
+          response.data.aggregations[agg_field]?.buckets
+        ) {
+          setAggBuckets(response.data.aggregations[`${agg_field}`].buckets);
         }
       })
       .catch((error) => {
-        setIsLoading(false);
-
-        // console.error(error);
+        if (!axios.isCancel(error)) {
+          setIsLoading(false);
+        }
       });
-  }, [intValue.index, intValue.content_type, intValue.website]);
+
+    return () => {
+      // Cancel the request if the component is unmounted or the effect runs again
+      cancelTokenSource.cancel();
+    };
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [content_type, website, index, use_aggs, agg_field]);
+
+  useEffect(() => {
+    let nextTableData = {};
+
+    if (use_aggs && agg_field) {
+      const dataFromAggs =
+        aggBuckets && aggBuckets.length > 0
+          ? buildTableFromAggs(aggBuckets, agg_field)
+          : {};
+
+      if (Object.keys(dataFromAggs).length > 0) {
+        nextTableData = dataFromAggs;
+      }
+    } else if (
+      hits &&
+      hits.length > 0 &&
+      fields &&
+      fields.length > 0 &&
+      !use_aggs
+    ) {
+      const dataFromHits = buildTableFromFields(hits, fields);
+
+      if (Object.keys(dataFromHits).length > 0) {
+        nextTableData = dataFromHits;
+      }
+    }
+
+    if (!isEqual(nextTableData, tableData)) {
+      setTableData(nextTableData);
+    }
+  }, [hits, fields, aggBuckets, agg_field, use_aggs, tableData]);
 
   let schema = PanelsSchema({
-    data: intValue,
+    data: formValue,
     aggs: results?.aggregations,
     hits: results?.hits,
   });
 
   const handleChangeField = (val, id) => {
-    setIntValue({ ...intValue, [id]: val });
+    setFormValue({ ...formValue, [id]: val });
   };
 
-  // console.log('hits', hits);
-  // console.log(intValue?.fields, 'value');
+  const getEmptyFields = () => {
+    let emptyFields = [];
+
+    // Check for empty string fields
+    if (!index) emptyFields.push('index');
+    if (!website) emptyFields.push('website');
+    if (!content_type) emptyFields.push('content_type');
+
+    // Conditionally check for agg_field or fields based on use_aggs
+    if (use_aggs) {
+      if (!agg_field) emptyFields.push('agg_field');
+    } else {
+      if (fields.length === 0) emptyFields.push('fields');
+    }
+
+    return emptyFields;
+  };
+
+  React.useEffect(() => {
+    setEmptyFields(getEmptyFields());
+  }, [index, website, content_type, use_aggs, agg_field]);
 
   return (
     <Modal open={true} size="fullscreen" className="chart-editor-modal">
@@ -69,12 +206,42 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
               onChangeField={(id, value) => {
                 handleChangeField(value, id);
               }}
-              formData={intValue}
+              formData={formValue}
             />
           </Grid.Column>
           <Grid.Column mobile={12} tablet={12} computer={7}>
             <div className="dataview-container">
-              <DataView hits={hits} fields={intValue?.fields} />
+              {isLoading && (
+                <p className="elastic-data-loader">
+                  <span>L</span>
+                  <span>o</span>
+                  <span>a</span>
+                  <span>d</span>
+                  <span>i</span>
+                  <span>n</span>
+                  <span>g</span>
+                  <span> </span>
+                  <span>d</span>
+                  <span>a</span>
+                  <span>t</span>
+                  <span>a</span>
+                  <span>.</span>
+                  <span>.</span>
+                  <span>.</span>
+                </p>
+              )}
+              {emptyFields.length === 0 ? (
+                <>{!isLoading && <DataView tableData={tableData} />}</>
+              ) : (
+                <div>
+                  <h4>Please complete the following fields:</h4>
+                  <ul>
+                    {emptyFields.map((field, index) => (
+                      <li key={index}>{field}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           </Grid.Column>
         </Grid>
@@ -86,7 +253,12 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
               <Button
                 primary
                 floated="right"
-                onClick={() => onChange(intValue)}
+                onClick={() =>
+                  onChange({
+                    formValue: formValue,
+                    elasticQueryConfig,
+                  })
+                }
               >
                 Apply changes
               </Button>
@@ -141,7 +313,6 @@ const Elastic2CSVWidget = ({
         </Button>
       </div>
       {description && <p className="help">{description}</p>}
-      {/* TODO: make sure to insert a data table view.. like the view */}
       {showEditor ? (
         <WidgetModalEditor
           value={value}

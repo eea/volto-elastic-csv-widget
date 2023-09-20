@@ -5,6 +5,8 @@ const createAggregatedPayload = (payloadConfig) => {
     index = '',
     //size = 10000,
     size = 100,
+    use_aggs,
+    agg_field,
   } = payloadConfig;
 
   let mustQueries = [
@@ -70,6 +72,32 @@ const createAggregatedPayload = (payloadConfig) => {
     });
   }
 
+  // Define default aggregations
+  let aggregations = {
+    objectProvides: {
+      terms: {
+        field: 'objectProvides',
+        size: 1000000,
+      },
+    },
+    cluster_name: {
+      terms: {
+        field: 'cluster_name',
+        size: 1000000,
+      },
+    },
+  };
+
+  // Add aggregation for agg_field if use_aggs and agg_field are true
+  if (use_aggs && agg_field) {
+    aggregations[agg_field] = {
+      terms: {
+        field: `${agg_field}.keyword`,
+        size: 1000000,
+      },
+    };
+  }
+
   return {
     index,
     query: {
@@ -81,24 +109,43 @@ const createAggregatedPayload = (payloadConfig) => {
         },
       },
     },
-    aggs: {
-      objectProvides: {
-        terms: {
-          field: 'objectProvides',
-          size: 1000000,
-        },
-      },
-      cluster_name: {
-        terms: {
-          field: 'cluster_name',
-          size: 1000000,
-        },
-      },
-    },
+    aggs: aggregations,
     size: size,
     source: { exclude: ['embedding'] },
     track_total_hits: true,
   };
 };
 
-export { createAggregatedPayload };
+const buildTableFromFields = (items, fields) => {
+  let table = {};
+
+  fields.forEach((fieldObj) => {
+    // Get the field name from the field object.
+    let fieldName = fieldObj.field;
+
+    // For each field, extract values from all items.
+    table[fieldName] = items.map((item) => item._source[fieldName]);
+  });
+
+  return table;
+};
+
+const buildTableFromAggs = (data, fieldName) => {
+  let valuesColumn = `${fieldName}_values`;
+  let countColumn = `${fieldName}_count`;
+
+  let table = {
+    [valuesColumn]: [],
+    [countColumn]: [],
+  };
+
+  data.forEach((bucket) => {
+    // Add the bucket key and doc_count to the table.
+    table[valuesColumn].push(bucket.key);
+    table[countColumn].push(bucket.doc_count);
+  });
+
+  return table;
+};
+
+export { createAggregatedPayload, buildTableFromFields, buildTableFromAggs };
