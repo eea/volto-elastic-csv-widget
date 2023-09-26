@@ -45,12 +45,15 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
     website = '',
     content_type = '',
     use_aggs = false,
-    agg_field = '',
+    agg_fields = [],
   } = formValue;
 
   const row_size = hits.length;
 
   const previousPayloadConfigRef = React.useRef(null);
+
+  const stringifiedAggFields = JSON.stringify(agg_fields);
+  const stringifiedFields = JSON.stringify(fields);
 
   useEffect(() => {
     const es_endpoint = toPublicURL(`/_es/globalsearch/_search/`);
@@ -59,7 +62,7 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
       objectProvides: content_type,
       cluster_name: website,
       index: index,
-      agg_field,
+      agg_fields,
       use_aggs,
     };
 
@@ -94,13 +97,13 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
           }));
         }
 
-        if (
-          response.data.aggregations &&
-          agg_field &&
-          use_aggs &&
-          response.data.aggregations[agg_field]?.buckets
-        ) {
-          setAggBuckets(response.data.aggregations[`${agg_field}`].buckets);
+        if (response.data.aggregations && agg_fields.length > 0 && use_aggs) {
+          agg_fields.forEach((agg_field) => {
+            if (response.data.aggregations[agg_field.field]?.buckets)
+              setAggBuckets(
+                response.data.aggregations[`${agg_field.field}`].buckets,
+              );
+          });
         }
       })
       .catch((error) => {
@@ -115,15 +118,15 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
     };
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [content_type, website, index, use_aggs, agg_field]);
+  }, [content_type, website, index, use_aggs, stringifiedAggFields]);
 
   useEffect(() => {
     let nextTableData = {};
 
-    if (use_aggs && agg_field) {
+    if (use_aggs && agg_fields.length > 0) {
       const dataFromAggs =
         aggBuckets && aggBuckets.length > 0
-          ? buildTableFromAggs(aggBuckets, agg_field)
+          ? buildTableFromAggs(aggBuckets, agg_fields)
           : {};
 
       if (Object.keys(dataFromAggs).length > 0) {
@@ -146,7 +149,14 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
     if (!isEqual(nextTableData, tableData)) {
       setTableData(nextTableData);
     }
-  }, [hits, fields, aggBuckets, agg_field, use_aggs, tableData]);
+  }, [
+    hits,
+    stringifiedFields,
+    aggBuckets,
+    stringifiedAggFields,
+    use_aggs,
+    tableData,
+  ]);
 
   let schema = PanelsSchema({
     data: formValue,
@@ -168,7 +178,7 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
 
     // Conditionally check for agg_field or fields based on use_aggs
     if (use_aggs) {
-      if (!agg_field) emptyFields.push('agg_field');
+      if (agg_fields.length === 0) emptyFields.push('agg_fields');
     } else {
       if (fields.length === 0) emptyFields.push('fields');
     }
@@ -178,7 +188,14 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
 
   React.useEffect(() => {
     setEmptyFields(getEmptyFields());
-  }, [index, website, content_type, use_aggs, agg_field]);
+  }, [
+    index,
+    website,
+    content_type,
+    use_aggs,
+    stringifiedAggFields,
+    stringifiedFields,
+  ]);
 
   return (
     <Modal open={true} size="fullscreen" className="chart-editor-modal">
