@@ -6,7 +6,7 @@ const createAggregatedPayload = (payloadConfig) => {
     //size = 10000,
     size = 100,
     use_aggs,
-    agg_field,
+    agg_fields,
   } = payloadConfig;
 
   let mustQueries = [
@@ -89,13 +89,15 @@ const createAggregatedPayload = (payloadConfig) => {
   };
 
   // Add aggregation for agg_field if use_aggs and agg_field are true
-  if (use_aggs && agg_field) {
-    aggregations[agg_field] = {
-      terms: {
-        field: `${agg_field}.keyword`,
-        size: 1000000,
-      },
-    };
+  if (use_aggs && agg_fields.length > 0) {
+    agg_fields.forEach((agg_field) => {
+      aggregations[agg_field.field] = {
+        terms: {
+          field: `${agg_field.field}.keyword`,
+          size: 1000000,
+        },
+      };
+    });
   }
 
   return {
@@ -122,27 +124,32 @@ const buildTableFromFields = (items, fields) => {
   fields.forEach((fieldObj) => {
     // Get the field name from the field object.
     let fieldName = fieldObj.field;
+    const fieldLabel = fieldObj.title ? fieldObj.title : fieldObj.field;
 
     // For each field, extract values from all items.
-    table[fieldName] = items.map((item) => item._source[fieldName]);
+    table[fieldLabel] = items.map((item) => item._source[fieldName]);
   });
 
   return table;
 };
 
-const buildTableFromAggs = (data, fieldName) => {
-  let valuesColumn = `${fieldName}_values`;
-  let countColumn = `${fieldName}_count`;
+const buildTableFromAggs = (data, fields) => {
+  let table = {};
+  fields.forEach((field) => {
+    const fieldLabel = field.title ? field.title + ' ' : field.field + '_';
+    let valuesColumn = `${fieldLabel}values`;
+    let countColumn = `${fieldLabel}count`;
 
-  let table = {
-    [valuesColumn]: [],
-    [countColumn]: [],
-  };
-
-  data.forEach((bucket) => {
-    // Add the bucket key and doc_count to the table.
-    table[valuesColumn].push(bucket.key);
-    table[countColumn].push(bucket.doc_count);
+    table = { ...table, [valuesColumn]: [], [countColumn]: [] };
+    data.forEach((bucket) => {
+      if (Object.keys(bucket)[0] === field.field) {
+        Object.values(bucket)[0].forEach((currentBucket) => {
+          // Add the bucket key and doc_count to the table.
+          table[valuesColumn].push(currentBucket.key);
+          table[countColumn].push(currentBucket.doc_count);
+        });
+      }
+    });
   });
 
   return table;
