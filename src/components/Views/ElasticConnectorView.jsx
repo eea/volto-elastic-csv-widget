@@ -17,7 +17,18 @@ const ElasticConnectorConfigView = ({ content, tableData }) => {
   const connectorConfig = content?.elastic_csv_widget?.formValue;
 
   const not_agg_fields =
+<<<<<<< Updated upstream
     connectorConfig && Object.keys(connectorConfig).length > 0
+=======
+<<<<<<< Updated upstream
+    connectorConfig && connectorConfig.length > 0
+=======
+    connectorConfig &&
+    Object.keys(connectorConfig).length > 0 &&
+    connectorConfig?.fields &&
+    connectorConfig.fields.length > 0
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
       ? connectorConfig?.fields.map((field) => field.field)
       : [];
 

@@ -201,6 +201,8 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
     stringifiedFields,
   ]);
 
+  console.log('formval + query', formValue, elasticQueryConfig);
+
   return (
     <Modal open={true} size="fullscreen" className="chart-editor-modal">
       <Modal.Content scrolling>
