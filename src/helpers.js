@@ -141,11 +141,14 @@ const buildTableFromAggs = (data, fields) => {
     let countColumn = `${fieldLabel}count`;
 
     table = { ...table, [valuesColumn]: [], [countColumn]: [] };
-
     data.forEach((bucket) => {
-      // Add the bucket key and doc_count to the table.
-      table[valuesColumn].push(bucket.key);
-      table[countColumn].push(bucket.doc_count);
+      if (Object.keys(bucket)[0] === field.field) {
+        Object.values(bucket)[0].forEach((currentBucket) => {
+          // Add the bucket key and doc_count to the table.
+          table[valuesColumn].push(currentBucket.key);
+          table[countColumn].push(currentBucket.doc_count);
+        });
+      }
     });
   });
 

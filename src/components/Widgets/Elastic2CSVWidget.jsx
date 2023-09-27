@@ -98,11 +98,15 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
         }
 
         if (response.data.aggregations && agg_fields.length > 0 && use_aggs) {
+          let buckets = [];
           agg_fields.forEach((agg_field) => {
-            if (response.data.aggregations[agg_field.field]?.buckets)
-              setAggBuckets(
-                response.data.aggregations[`${agg_field.field}`].buckets,
-              );
+            if (response.data.aggregations[agg_field.field]?.buckets) {
+              let bucketObj = {};
+              bucketObj[agg_field.field] =
+                response.data.aggregations[`${agg_field.field}`].buckets;
+              buckets = [...buckets, bucketObj];
+            }
+            setAggBuckets(buckets);
           });
         }
       })
