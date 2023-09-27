@@ -56,7 +56,9 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
   const stringifiedFields = JSON.stringify(fields);
 
   useEffect(() => {
-    const es_endpoint = toPublicURL(`/_es/globalsearch/_search/`);
+    const es_endpoint = __DEVELOPMENT__
+      ? `${process.env.RAZZLE_PROXY_QA_DSN_globalsearch}/_search/`
+      : toPublicURL(`/_es/globalsearch/_search/`);
 
     const payloadConfig = {
       objectProvides: content_type,
