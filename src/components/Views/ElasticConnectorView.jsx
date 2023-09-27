@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-expressions */
-
 import React from 'react';
 import { Container } from 'semantic-ui-react';
 import DataView from '../DataView/DataView';
@@ -17,28 +15,19 @@ const ElasticConnectorConfigView = ({ content, tableData }) => {
   const connectorConfig = content?.elastic_csv_widget?.formValue;
 
   const not_agg_fields =
-<<<<<<< Updated upstream
-    connectorConfig && Object.keys(connectorConfig).length > 0
-=======
-<<<<<<< Updated upstream
-    connectorConfig && connectorConfig.length > 0
-=======
     connectorConfig &&
     Object.keys(connectorConfig).length > 0 &&
     connectorConfig?.fields &&
     connectorConfig.fields.length > 0
->>>>>>> Stashed changes
->>>>>>> Stashed changes
       ? connectorConfig?.fields.map((field) => field.field)
       : [];
 
-  let fields = [];
-
-  if (connectorConfig?.use_aggs && connectorConfig?.agg_fields) {
-    connectorConfig?.agg_fields.forEach((field) => {
-      fields = [...fields, `${field?.field}_count`, `${field?.field}_values`];
-    });
-  } else fields = [...fields, ...not_agg_fields];
+  const fields = connectorConfig?.use_aggs
+    ? [
+        `${connectorConfig?.agg_field}_count`,
+        `${connectorConfig?.agg_field}_values`,
+      ]
+    : not_agg_fields;
 
   return (
     <Container className="elastic-connector-config">
