@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-expressions */
+
 import React from 'react';
 import { Container } from 'semantic-ui-react';
 import DataView from '../DataView/DataView';
@@ -22,12 +24,13 @@ const ElasticConnectorConfigView = ({ content, tableData }) => {
       ? connectorConfig?.fields.map((field) => field.field)
       : [];
 
-  const fields = connectorConfig?.use_aggs
-    ? [
-        `${connectorConfig?.agg_field}_count`,
-        `${connectorConfig?.agg_field}_values`,
-      ]
-    : not_agg_fields;
+  let fields = [];
+
+  if (connectorConfig?.use_aggs && connectorConfig?.agg_fields) {
+    connectorConfig?.agg_fields.forEach((field) => {
+      fields = [...fields, `${field?.field}_count`, `${field?.field}_values`];
+    });
+  } else fields = [...fields, ...not_agg_fields];
 
   return (
     <Container className="elastic-connector-config">
