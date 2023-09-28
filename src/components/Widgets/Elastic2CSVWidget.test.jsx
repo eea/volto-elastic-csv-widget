@@ -5,6 +5,11 @@ import { IntlProvider } from 'react-intl';
 
 import Elastic2CSVWidget from './Elastic2CSVWidget';
 
+jest.mock('@plone/volto/components', () => ({
+  FormFieldWrapper: jest.fn(({ children }) => <>{children}</>),
+  InlineForm: jest.fn(() => <div>Mocked InlineForm</div>),
+}));
+
 global.__DEVELOPMENT__ = true;
 process.env.RAZZLE_PROXY_QA_DSN_globalsearch = 'http://my.endpoint.com';
 jest.mock('@plone/volto/helpers', () => ({
@@ -36,7 +41,7 @@ describe('Elastic2CSVWidget', () => {
         description={'widget description'}
         error={undefined}
         value={value}
-        onChange
+        onChange={() => {}}
       />,
       {
         wrapper: IntlWrapper,
@@ -55,7 +60,7 @@ describe('Elastic2CSVWidget', () => {
         description={'widget description'}
         error={undefined}
         value={value}
-        onChange
+        onChange={() => {}}
       />,
       {
         wrapper: IntlWrapper,
