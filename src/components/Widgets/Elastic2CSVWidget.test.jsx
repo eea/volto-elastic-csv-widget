@@ -61,4 +61,64 @@ describe('Elastic2CSVWidget', () => {
       ).toBeInTheDocument(),
     );
   });
+
+  it('should render the "Open Data Editor" button', () => {
+    const { getByText } = render(
+      <Elastic2CSVWidget
+        id={id}
+        title={'Elastic CSV widget'}
+        description={'widget description'}
+        error={undefined}
+        value={value}
+        onChange={() => {}}
+      />,
+      {
+        wrapper: IntlWrapper,
+      },
+    );
+    const button = getByText('Open Data Editor');
+    expect(button).toBeInTheDocument();
+    fireEvent.click(button);
+    waitFor(() =>
+      expect(document.querySelector('.chart-editor-modal')).toBeInTheDocument()
+    );
+  });
+
+  it('should display error messages', () => {
+    const errorMessage = 'This is an error message';
+    const { getByText } = render(
+      <Elastic2CSVWidget
+        id={id}
+        title={'Elastic CSV widget'}
+        description={'widget description'}
+        error={[errorMessage]}
+        value={value}
+        onChange={() => {}}
+      />,
+      {
+        wrapper: IntlWrapper,
+      },
+    );
+    expect(getByText(errorMessage)).toBeInTheDocument();
+  });
+
+  it('should display the title and description', () => {
+    const title = 'Elastic CSV widget';
+    const description = 'widget description';
+    const { getByText } = render(
+      <Elastic2CSVWidget
+        id={id}
+        title={title}
+        description={description}
+        error={undefined}
+        value={value}
+        onChange={() => {}}
+      />,
+      {
+        wrapper: IntlWrapper,
+      },
+    );
+    expect(getByText(title)).toBeInTheDocument();
+    expect(getByText(description)).toBeInTheDocument();
+  });
 });
