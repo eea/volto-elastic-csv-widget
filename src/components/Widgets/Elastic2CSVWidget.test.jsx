@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, waitFor } from '@testing-library/react';
+import { render, waitFor, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import { IntlProvider } from 'react-intl';
 
@@ -80,7 +80,7 @@ describe('Elastic2CSVWidget', () => {
     expect(button).toBeInTheDocument();
     fireEvent.click(button);
     waitFor(() =>
-      expect(document.querySelector('.chart-editor-modal')).toBeInTheDocument()
+      expect(document.querySelector('.chart-editor-modal')).toBeInTheDocument(),
     );
   });
 

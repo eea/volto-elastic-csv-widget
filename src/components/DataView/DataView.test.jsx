@@ -32,7 +32,9 @@ describe('DataView', () => {
       column1: ['data1', 'data2'],
       column2: ['data3', 'data4'],
     };
-    const { getAllByRole } = render(<DataView tableData={mockDataWithHeaders} />);
+    const { getAllByRole } = render(
+      <DataView tableData={mockDataWithHeaders} />,
+    );
     const headers = getAllByRole('columnheader');
     expect(headers).toHaveLength(2);
     expect(headers[0]).toHaveTextContent('column1');
