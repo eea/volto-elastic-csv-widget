@@ -6,8 +6,8 @@ import './styles.less';
 
 const DataView = ({ tableData }) => {
   const rows =
-    tableData && Object.keys(tableData).length > 0 && Object.keys(tableData)[0]
-      ? tableData[Object.keys(tableData)[0]].length
+    tableData && Object.keys(tableData).length > 0
+      ? Math.max(...Object.values(tableData).map((field) => field.length))
       : 0;
 
   return (

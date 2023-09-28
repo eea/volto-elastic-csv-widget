@@ -25,7 +25,7 @@ const fieldSchema = (hits) => {
       {
         id: 'default',
         title: 'Default',
-        fields: ['field'],
+        fields: ['field', 'title'],
       },
     ],
 
@@ -33,6 +33,10 @@ const fieldSchema = (hits) => {
       field: {
         title: 'Field',
         choices: extractUniqueFields(hits),
+      },
+      title: {
+        title: 'Title',
+        type: 'string',
       },
     },
 
@@ -58,7 +62,7 @@ export default ({ data = {}, aggs = {}, hits = {} }) => {
         fields: [
           'index',
           ...(data?.index ? ['website', 'content_type', 'use_aggs'] : []),
-          ...(data?.use_aggs ? ['agg_field'] : ['fields']),
+          ...(data?.use_aggs ? ['agg_fields'] : ['fields']),
         ],
       },
     ],
@@ -81,9 +85,10 @@ export default ({ data = {}, aggs = {}, hits = {} }) => {
         description: 'Choose the content-type you wish to create data with',
         choices: contentTypes,
       },
-      agg_field: {
+      agg_fields: {
         title: 'Aggregation field',
-        choices: extractUniqueFields(hits),
+        widget: 'object_list',
+        schema: fieldSchema(hits),
       },
       fields: {
         title: 'Fields',
