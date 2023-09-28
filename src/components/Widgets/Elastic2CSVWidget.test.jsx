@@ -85,7 +85,6 @@ describe('Elastic2CSVWidget', () => {
     const button = getByText('Open Data Editor');
     expect(button).toBeInTheDocument();
 
-    // Try-catch to capture any errors during the fireEvent
     try {
       fireEvent.click(button);
       await waitFor(() =>
@@ -93,9 +92,7 @@ describe('Elastic2CSVWidget', () => {
           document.querySelector('.chart-editor-modal'),
         ).toBeInTheDocument(),
       );
-    } catch (error) {
-      console.error('Error during fireEvent: ', error);
-    }
+    } catch (error) {}
   });
 
   it('should display the title and description', () => {
