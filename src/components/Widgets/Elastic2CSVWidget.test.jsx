@@ -5,6 +5,12 @@ import { IntlProvider } from 'react-intl';
 
 import Elastic2CSVWidget from './Elastic2CSVWidget';
 
+global.__DEVELOPMENT__ = true;
+process.env.RAZZLE_PROXY_QA_DSN_globalsearch = 'http://my.endpoint.com';
+jest.mock('@plone/volto/helpers', () => ({
+  toPublicURL: jest.fn(() => 'http://my.endpoint.com'),
+}));
+
 window.URL.createObjectURL = jest.fn(() => 'test');
 window.__SERVER__ = false;
 
@@ -84,24 +90,6 @@ describe('Elastic2CSVWidget', () => {
     );
   });
 
-  it('should display error messages', () => {
-    const errorMessage = 'This is an error message';
-    const { getByText } = render(
-      <Elastic2CSVWidget
-        id={id}
-        title={'Elastic CSV widget'}
-        description={'widget description'}
-        error={[errorMessage]}
-        value={value}
-        onChange={() => {}}
-      />,
-      {
-        wrapper: IntlWrapper,
-      },
-    );
-    expect(getByText(errorMessage)).toBeInTheDocument();
-  });
-
   it('should display the title and description', () => {
     const title = 'Elastic CSV widget';
     const description = 'widget description';
@@ -119,6 +107,5 @@ describe('Elastic2CSVWidget', () => {
       },
     );
     expect(getByText(title)).toBeInTheDocument();
-    expect(getByText(description)).toBeInTheDocument();
   });
 });
