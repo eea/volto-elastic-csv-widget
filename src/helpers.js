@@ -3,8 +3,8 @@ const createAggregatedPayload = (payloadConfig) => {
     objectProvides = '',
     cluster_name = '',
     index = '',
-    size = 10000,
-    //size = 100,
+    //size = 10000,
+    size = 100,
     use_aggs,
     agg_fields,
   } = payloadConfig;
