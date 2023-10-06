@@ -56,7 +56,7 @@ describe('Helper Functions', () => {
       const table = buildTableFromAggs(data, fields);
       expect(table).toEqual({
         'Test Field values': ['key1', 'key2'],
-        'Test Field count': [10, 20],
+        'Test Field total': [10, 20],
       });
     });
   });
