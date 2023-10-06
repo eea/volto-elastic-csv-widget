@@ -97,9 +97,20 @@ const createAggregatedPayload = (payloadConfig) => {
           size: 1000000,
         },
       };
+
+      // Check if secondLevelAgg is present and is truthy
+      if (agg_field.secondLevelAgg) {
+        aggregations[agg_field.field].aggs = {
+          [agg_field.secondLevelAgg]: {
+            terms: {
+              field: `${agg_field.secondLevelAgg}.keyword`,
+              size: 1000000,
+            },
+          },
+        };
+      }
     });
   }
-
   return {
     index,
     query: {
@@ -134,21 +145,71 @@ const buildTableFromFields = (items, fields) => {
 };
 
 const buildTableFromAggs = (data, fields) => {
+  // Check for valid input
+  if (!Array.isArray(data) || !Array.isArray(fields) || fields.length === 0) {
+    return {};
+  }
+
   let table = {};
+
   fields.forEach((field) => {
+    // Ensure valid field data
+    if (!field.field && !field.title) {
+      return;
+    }
+
     const fieldLabel = field.title ? field.title + ' ' : field.field + '_';
     let valuesColumn = `${fieldLabel}values`;
-    let countColumn = `${fieldLabel}count`;
+    let countColumn = `${fieldLabel}total`;
+    table[valuesColumn] = [];
+    table[countColumn] = [];
 
-    table = { ...table, [valuesColumn]: [], [countColumn]: [] };
-    data.forEach((bucket) => {
-      if (Object.keys(bucket)[0] === field.field) {
-        Object.values(bucket)[0].forEach((currentBucket) => {
-          // Add the bucket key and doc_count to the table.
-          table[valuesColumn].push(currentBucket.key);
-          table[countColumn].push(currentBucket.doc_count);
-        });
+    // Traverse through data and extract first-level values and counts
+    data.forEach((datum) => {
+      // Ensure the data contains necessary field
+      if (!datum[field.field]) {
+        return;
       }
+
+      (datum[field.field] || []).forEach((bucket) => {
+        // Check for valid bucket data
+        if (bucket.key == null || typeof bucket.doc_count !== 'number') {
+          return;
+        }
+
+        table[valuesColumn].push(bucket.key);
+        table[countColumn].push(bucket.doc_count);
+
+        // Handle second-level aggregation if specified
+        if (field.secondLevelAgg && bucket[field.secondLevelAgg]) {
+          (bucket[field.secondLevelAgg].buckets || []).forEach((subBucket) => {
+            // Ensure valid sub-bucket data
+            if (
+              subBucket.key == null ||
+              typeof subBucket.doc_count !== 'number'
+            ) {
+              return;
+            }
+
+            if (!table[subBucket.key]) {
+              table[subBucket.key] = Array(table[valuesColumn].length - 1).fill(
+                0,
+              );
+            }
+            table[subBucket.key].push(subBucket.doc_count);
+          });
+
+          // Ensure all columns have the same length after each push to the table
+          const maxColLength = Math.max(
+            ...Object.values(table).map((col) => col.length),
+          );
+          Object.keys(table).forEach((colKey) => {
+            while (table[colKey].length < maxColLength) {
+              table[colKey].push(0);
+            }
+          });
+        }
+      });
     });
   });
 

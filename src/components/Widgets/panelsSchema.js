@@ -25,7 +25,7 @@ const fieldSchema = (hits) => {
       {
         id: 'default',
         title: 'Default',
-        fields: ['field', 'title'],
+        fields: ['field', 'title', 'secondLevelAgg'],
       },
     ],
 
@@ -37,6 +37,10 @@ const fieldSchema = (hits) => {
       title: {
         title: 'Title',
         type: 'string',
+      },
+      secondLevelAgg: {
+        title: 'Aggregation',
+        choices: extractUniqueFields(hits),
       },
     },
 
