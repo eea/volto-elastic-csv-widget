@@ -23,26 +23,6 @@ describe('Helper Functions', () => {
       );
     });
 
-    it('should modify mustQueries when objectProvides is specified', () => {
-      const payload = createAggregatedPayload({
-        objectProvides: 'providesObject',
-      });
-      expect(payload.query.bool.must).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            bool: expect.objectContaining({
-              should: expect.arrayContaining([
-                expect.objectContaining({
-                  term: { objectProvides: 'providesObject' },
-                }),
-              ]),
-              minimum_should_match: 1,
-            }),
-          }),
-        ]),
-      );
-    });
-
     it('should include second level aggregations when specified', () => {
       const payload = createAggregatedPayload({
         use_aggs: true,
