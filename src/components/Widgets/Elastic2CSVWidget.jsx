@@ -313,8 +313,11 @@ const Elastic2CSVWidget = ({
   return (
     <FormFieldWrapper {...{ id, title, description, error, value }} columns={1}>
       <div className="wrapper">
-        <label htmlFor={`field-${id}`}>{title}</label>
+        <label className="wrapper-title-label" htmlFor={`field-${id}`}>
+          {title}
+        </label>
         <Button
+          className="open-data-editor-button"
           floated="right"
           onClick={(e) => {
             e.preventDefault();
@@ -336,7 +339,13 @@ const Elastic2CSVWidget = ({
         ''
       )}
       {map(error, (message) => (
-        <Label key={message} basic color="red" pointing>
+        <Label
+          key={message}
+          basic
+          color="red"
+          pointing
+          className="error-label-csv-widget"
+        >
           {message}
         </Label>
       ))}

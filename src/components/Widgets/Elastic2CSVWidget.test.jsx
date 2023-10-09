@@ -118,4 +118,92 @@ describe('Elastic2CSVWidget', () => {
     );
     expect(getByText(title)).toBeInTheDocument();
   });
+  it('should display wrapper', () => {
+    const title = 'Elastic CSV widget';
+    const description = 'widget description';
+    const { container } = render(
+      <Elastic2CSVWidget
+        id={id}
+        title={title}
+        description={description}
+        error={undefined}
+        value={value}
+        onChange={() => {}}
+      />,
+      {
+        wrapper: IntlWrapper,
+      },
+    );
+    const modalElement = container.querySelector('.wrapper');
+    expect(modalElement).toBeInTheDocument();
+  });
+
+  it('should display wrapper', () => {
+    const title = 'Elastic CSV widget';
+    const description = 'widget description';
+    const { container } = render(
+      <Elastic2CSVWidget
+        id={id}
+        title={title}
+        description={description}
+        error={undefined}
+        value={value}
+        onChange={() => {}}
+      />,
+      {
+        wrapper: IntlWrapper,
+      },
+    );
+    const modalElement = container.querySelector('.wrapper');
+    expect(modalElement).toBeInTheDocument();
+  });
+
+  it('should display description', () => {
+    const description = 'widget description';
+    const { getByText } = render(
+      <Elastic2CSVWidget description={description} /* other props */ />,
+      { wrapper: IntlWrapper },
+    );
+    expect(getByText(description)).toBeInTheDocument();
+  });
+
+  it('should display wrapper', () => {
+    const title = 'Elastic CSV widget';
+    const description = 'widget description';
+    const { container } = render(
+      <Elastic2CSVWidget
+        id={id}
+        title={title}
+        description={description}
+        error={undefined}
+        value={value}
+        onChange={() => {}}
+      />,
+      {
+        wrapper: IntlWrapper,
+      },
+    );
+    const modalElement = container.querySelector('.open-data-editor-button');
+    expect(modalElement).toBeInTheDocument();
+  });
+
+  it('should display wrapper', () => {
+    const title = 'Elastic CSV widget';
+    const description = 'widget description';
+    const { container } = render(
+      <Elastic2CSVWidget
+        id={id}
+        title={title}
+        description={description}
+        error={undefined}
+        value={value}
+        onChange={() => {}}
+      />,
+      {
+        wrapper: IntlWrapper,
+      },
+    );
+    const modalElement = container.querySelector('.wrapper-title-label');
+    expect(modalElement).toBeInTheDocument();
+  });
 });
