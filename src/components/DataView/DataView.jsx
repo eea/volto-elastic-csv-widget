@@ -6,8 +6,8 @@ import './styles.less';
 
 const DataView = ({ tableData }) => {
   const rows =
-    tableData && Object.keys(tableData).length > 0
-      ? Math.max(...Object.values(tableData).map((field) => field.length))
+    tableData && Object.keys(tableData) && Object.keys(tableData).length > 0
+      ? Math.max(...Object.values(tableData).map((field) => field?.length))
       : 0;
 
   return (
@@ -18,7 +18,10 @@ const DataView = ({ tableData }) => {
             <Table.Header>
               <Table.Row>
                 {Object.keys(tableData || {}).map((column) => (
-                  <Table.HeaderCell key={column}>
+                  <Table.HeaderCell
+                    key={column}
+                    className="dataview-table-header-cell"
+                  >
                     {column && column !== 'undefined' ? column : ''}
                   </Table.HeaderCell>
                 ))}

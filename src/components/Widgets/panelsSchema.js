@@ -1,3 +1,4 @@
+/* eslint-disable import/no-anonymous-default-export */
 function extractUniqueFields(data) {
   let fieldsSet = new Set();
 
@@ -25,7 +26,7 @@ const fieldSchema = (hits) => {
       {
         id: 'default',
         title: 'Default',
-        fields: ['field', 'title'],
+        fields: ['field', 'title', 'secondLevelAgg'],
       },
     ],
 
@@ -37,6 +38,10 @@ const fieldSchema = (hits) => {
       title: {
         title: 'Title',
         type: 'string',
+      },
+      secondLevelAgg: {
+        title: 'Aggregation',
+        choices: extractUniqueFields(hits),
       },
     },
 
