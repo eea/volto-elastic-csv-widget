@@ -61,7 +61,6 @@ describe('DataView', () => {
     expect(screen.queryByText('data4')).not.toBeInTheDocument();
   });
 
-  // New test cases to enhance coverage
   it('should render the column headers correctly', () => {
     const mockData = {
       'Origin values': ['BD', 'HD'],
