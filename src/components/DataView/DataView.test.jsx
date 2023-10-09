@@ -107,4 +107,29 @@ describe('DataView', () => {
     expect(screen.getByText('BD')).toBeInTheDocument();
     // Ensure a null cell doesn't throw an error
   });
+
+  it('should display elastic-connector-view', () => {
+    const mockData = {
+      'Origin values': ['BD', null],
+    };
+    const { container } = render(<DataView tableData={mockData} />);
+    const modalElement = container.querySelector('.elastic-connector-view');
+    expect(modalElement).toBeInTheDocument();
+  });
+
+  it('should display dataview-table-header-cell', () => {
+    const mockData = {
+      'Origin values': ['BD', null],
+    };
+    const { container } = render(<DataView tableData={mockData} />);
+    const modalElement = container.querySelector('.dataview-table-header-cell');
+    expect(modalElement).toBeInTheDocument();
+  });
+
+  it('should display no-data-message', () => {
+    const mockData = '';
+    const { container } = render(<DataView tableData={mockData} />);
+    const modalElement = container.querySelector('.no-data-message');
+    expect(modalElement).toBeInTheDocument();
+  });
 });

@@ -18,7 +18,10 @@ const DataView = ({ tableData }) => {
             <Table.Header>
               <Table.Row>
                 {Object.keys(tableData || {}).map((column) => (
-                  <Table.HeaderCell key={column}>
+                  <Table.HeaderCell
+                    key={column}
+                    className="dataview-table-header-cell"
+                  >
                     {column && column !== 'undefined' ? column : ''}
                   </Table.HeaderCell>
                 ))}
