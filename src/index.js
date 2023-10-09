@@ -3,7 +3,8 @@ import Elastic2CSVWidget from './components/Widgets/Elastic2CSVWidget';
 
 const applyConfig = (config) => {
   //elasticconnector view
-  config.views.contentTypesViews.elasticconnector = ConnectedElasticConnectorView;
+  config.views.contentTypesViews.elasticconnector =
+    ConnectedElasticConnectorView;
 
   //elastic connector elastic_csv_widget
   config.widgets.id.elastic_csv_widget = Elastic2CSVWidget;
