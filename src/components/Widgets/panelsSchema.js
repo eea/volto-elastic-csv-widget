@@ -26,7 +26,7 @@ const fieldSchema = (hits) => {
       {
         id: 'default',
         title: 'Default',
-        fields: ['field', 'title', 'secondLevelAgg'],
+        fields: ['field', 'title'],
       },
     ],
 
@@ -34,6 +34,49 @@ const fieldSchema = (hits) => {
       field: {
         title: 'Field',
         choices: extractUniqueFields(hits),
+      },
+      title: {
+        title: 'Title',
+        type: 'string',
+      },
+    },
+
+    required: [''],
+  };
+};
+
+const aggFieldSchema = (hits) => {
+  return {
+    title: 'Field',
+
+    fieldsets: [
+      {
+        id: 'default',
+        title: 'Default',
+        fields: ['field', 'sortBy', 'sort', 'title', 'secondLevelAgg'],
+      },
+    ],
+
+    properties: {
+      field: {
+        title: 'Field',
+        choices: extractUniqueFields(hits),
+      },
+      sort: {
+        title: 'Sort',
+        choices: [
+          ['asc', 'asc'],
+          ['desc', 'desc'],
+        ],
+      },
+      sortBy: {
+        title: 'Sort by',
+        description:
+          '_key: alphabetically / _count: number of documents per term',
+        choices: [
+          ['_key', '_key'],
+          ['_count', '_count'],
+        ],
       },
       title: {
         title: 'Title',
@@ -93,7 +136,7 @@ export default ({ data = {}, aggs = {}, hits = {} }) => {
       agg_fields: {
         title: 'Aggregation field',
         widget: 'object_list',
-        schema: fieldSchema(hits),
+        schema: aggFieldSchema(hits),
       },
       fields: {
         title: 'Fields',
