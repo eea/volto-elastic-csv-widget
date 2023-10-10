@@ -3,7 +3,8 @@ const createAggregatedPayload = (payloadConfig) => {
     objectProvides = '',
     cluster_name = '',
     index = '',
-    //size = 10000,
+    //size = 10000, 10k payload size will make the widget slower
+    //using aggs and low size is better for now bc we can use small size payload
     size = 100,
     use_aggs,
     agg_fields,
@@ -95,6 +96,11 @@ const createAggregatedPayload = (payloadConfig) => {
         terms: {
           field: `${agg_field.field}.keyword`,
           size: 1000000,
+          // Ordering by count, but it can as well be by key, or more
+          //https://www.elastic.co/guide/en/elasticsearch/reference/current/sort-search-results.html#sort-search-results
+          ...(agg_field.sort && agg_field.sortBy
+            ? { order: { [agg_field.sortBy]: agg_field.sort } }
+            : {}),
         },
       };
 

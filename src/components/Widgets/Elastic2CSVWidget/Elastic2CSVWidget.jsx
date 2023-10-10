@@ -17,10 +17,10 @@ import {
   buildTableFromFields,
   buildTableFromAggs,
   createAggregatedPayload,
-} from '../../helpers';
+} from '../../../helpers';
 
 import PanelsSchema from './panelsSchema';
-import DataView from '../DataView/DataView';
+import DataView from '../../DataView/DataView';
 
 import './styles.less';
 
@@ -165,6 +165,7 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
   ]);
 
   let schema = PanelsSchema({
+    payload: elasticQueryConfig?.payloadConfig,
     data: formValue,
     aggs: results?.aggregations,
     hits: results?.hits,
