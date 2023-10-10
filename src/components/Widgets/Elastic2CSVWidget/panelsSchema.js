@@ -92,7 +92,7 @@ const aggFieldSchema = (hits) => {
   };
 };
 
-export default ({ data = {}, aggs = {}, hits = {} }) => {
+export default ({ data = {}, aggs = {}, hits = {}, payload = '' }) => {
   const websites = aggs?.cluster_name?.buckets
     ? aggs?.cluster_name?.buckets.map((item, i) => [item.key, item.key])
     : [];
@@ -111,6 +111,7 @@ export default ({ data = {}, aggs = {}, hits = {} }) => {
           'index',
           ...(data?.index ? ['website', 'content_type', 'use_aggs'] : []),
           ...(data?.use_aggs ? ['agg_fields'] : ['fields']),
+          'raw_payload_widget',
         ],
       },
     ],
@@ -142,6 +143,13 @@ export default ({ data = {}, aggs = {}, hits = {} }) => {
         title: 'Fields',
         widget: 'object_list',
         schema: fieldSchema(hits),
+      },
+      raw_payload_widget: {
+        title: 'Payload',
+        //TODO: make payload editable
+        //description: 'Warning! Only edit this if you know what you are doing!',
+        widget: 'payload_widget',
+        data: payload,
       },
     },
     required: [],
