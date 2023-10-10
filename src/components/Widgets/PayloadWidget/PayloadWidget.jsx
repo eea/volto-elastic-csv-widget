@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /**
  * PayloadWidget component.
  * @module components/Widgets/PayloadWidget
@@ -38,19 +39,19 @@ const PayloadWidget = (props) => {
    * @param {string} id
    * @param {string} value
    */
-  const onhandleChange = (id, value) => {
-    if (!isValidJson(value)) {
-      setInvalidJSONError([intl.formatMessage(messages.invalidJSONError)]);
-      // remove error message after 1.5 seconds, since serves an informative role:
-      // in case of invalidation attempt the last valid JSON is shown
-      setTimeout(() => setInvalidJSONError([]), 1500);
-      onChange(id, prevValue);
-    } else {
-      setPrevValue(JSON.parse(value));
-      setInvalidJSONError([]);
-      onChange(id, JSON.parse(value));
-    }
-  };
+  // const onhandleChange = (id, value) => {
+  //   if (!isValidJson(value)) {
+  //     setInvalidJSONError([intl.formatMessage(messages.invalidJSONError)]);
+  //     // remove error message after 1.5 seconds, since serves an informative role:
+  //     // in case of invalidation attempt the last valid JSON is shown
+  //     setTimeout(() => setInvalidJSONError([]), 1500);
+  //     onChange(id, prevValue);
+  //   } else {
+  //     setPrevValue(JSON.parse(value));
+  //     setInvalidJSONError([]);
+  //     onChange(id, JSON.parse(value));
+  //   }
+  // };
 
   return (
     <FormFieldWrapper {...props} className="textarea" error={invalidJSONError}>
