@@ -23,7 +23,8 @@
     "cypress-fail-fast": "^5.0.1",
     "husky": "*",
     "lint-staged": "*",
-    "md5": "^2.3.0"
+    "md5": "^2.3.0",
+    "dotenv": "^16.3.2"
   },
   "lint-staged": {
     "src/**/*.{js,jsx,ts,tsx,json}": [
