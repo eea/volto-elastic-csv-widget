@@ -4,7 +4,7 @@ import { Table } from 'semantic-ui-react';
 
 import './styles.less';
 
-const DataView = ({ tableData }) => {
+const TableDataView = ({ tableData }) => {
   const rows =
     tableData && Object.keys(tableData) && Object.keys(tableData).length > 0
       ? Math.max(...Object.values(tableData).map((field) => field?.length))
@@ -51,4 +51,4 @@ const DataView = ({ tableData }) => {
   );
 };
 
-export default DataView;
+export default TableDataView;

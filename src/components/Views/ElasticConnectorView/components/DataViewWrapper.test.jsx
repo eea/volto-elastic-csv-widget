@@ -7,7 +7,7 @@ test('renders without crashing', () => {
   render(<DataViewWrapper tableData={{}} />);
 });
 
-test('does not render DataView when tableData is empty', () => {
+test('does not render TableDataView when tableData is empty', () => {
   const { getByText } = render(<DataViewWrapper />);
   expect(getByText('No table data')).toBeInTheDocument();
 });

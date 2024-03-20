@@ -17,7 +17,7 @@ test('renders ElasticConnectorConfigView', () => {
   expect(getByText('Test Title')).toBeInTheDocument();
 });
 
-test('does not render DataView when provider_data is empty', () => {
+test('does not render TableDataView when provider_data is empty', () => {
   const { container } = render(
     <ElasticConnectorView provider_data={{}} content={{}} />,
   );
