@@ -1,4 +1,4 @@
-require('dotenv').config({ path: __dirname + '/.env' })
+require('dotenv').config({ path: __dirname + '/.env' });
 
 module.exports = {
   testMatch: ['**/src/addons/**/?(*.)+(spec|test).[jt]s?(x)'],
@@ -26,7 +26,7 @@ module.exports = {
       '<rootDir>/node_modules/@plone/volto/jest-addons-loader.js',
   },
   transformIgnorePatterns: [
-    '/node_modules/(?!(@plone|@root|@package|@eeacms)/).*/',
+    '/node_modules/(?!(@plone|@root|@package|@eeacms|axios)/).*/',
   ],
   transform: {
     '^.+\\.js(x)?$': 'babel-jest',
@@ -48,4 +48,4 @@ module.exports = {
       '<rootDir>/node_modules/@eeacms/volto-elastic-csv-widget/jest.setup.js',
     ],
   }),
-}
+};
