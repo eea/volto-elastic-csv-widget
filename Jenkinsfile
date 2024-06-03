@@ -9,7 +9,7 @@ pipeline {
   environment {
     GIT_NAME = "volto-elastic-csv-widget"
     NAMESPACE = "@eeacms"
-    SONARQUBE_TAGS = "volto.eea.europa.eu,water.europa.eu-freshwater"
+    SONARQUBE_TAGS = "volto.eea.europa.eu,water.europa.eu-freshwater,water.europa.eu-marine"
     DEPENDENCIES = ""
     BACKEND_PROFILES = "eea.kitkat:testing"
     BACKEND_ADDONS = ""
