@@ -20,7 +20,7 @@ import {
 } from '../../../helpers';
 
 import PanelsSchema from './panelsSchema';
-import DataView from '../../DataView/DataView';
+import TableDataView from '../../TableDataView/TableDataView';
 
 import './styles.less';
 
@@ -245,7 +245,7 @@ const WidgetModalEditor = ({ onChange, onClose, block, value }) => {
                 </p>
               )}
               {emptyFields.length === 0 ? (
-                <>{!isLoading && <DataView tableData={tableData} />}</>
+                <>{!isLoading && <TableDataView tableData={tableData} />}</>
               ) : (
                 <div>
                   <h4>Please complete the following fields:</h4>

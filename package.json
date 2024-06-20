@@ -17,13 +17,15 @@
     "url": "git@github.com:eea/volto-elastic-csv-widget.git"
   },
   "devDependencies": {
+    "cypress": "13.1.0",
     "@cypress/code-coverage": "^3.10.0",
     "@plone/scripts": "*",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "cypress-fail-fast": "^5.0.1",
     "husky": "*",
     "lint-staged": "*",
-    "md5": "^2.3.0"
+    "md5": "^2.3.0",
+    "dotenv": "^16.3.2"
   },
   "lint-staged": {
     "src/**/*.{js,jsx,ts,tsx,json}": [
