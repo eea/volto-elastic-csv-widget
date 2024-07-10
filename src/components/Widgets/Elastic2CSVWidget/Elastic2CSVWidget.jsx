@@ -20,7 +20,7 @@ import {
 } from '../../../helpers';
 
 import PanelsSchema from './panelsSchema';
-import TableDataView from '../../TableDataView/TableDataView';
+import TableDataView from '../../DataView/DataView';
 
 import './styles.less';
 
