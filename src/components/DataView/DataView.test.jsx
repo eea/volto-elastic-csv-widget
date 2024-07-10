@@ -1,19 +1,19 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
-import TableDataView from './TableDataView';
+import DataView from './DataView';
 
-describe('TableDataView', () => {
+describe('DataView', () => {
   it('should render the component', () => {
     const mockData = {
       column1: ['data1', 'data2'],
     };
-    render(<TableDataView tableData={mockData} />);
+    render(<DataView tableData={mockData} />);
     expect(screen.getByText('data1')).toBeInTheDocument();
   });
 
   it('should display "No compatible data" message when there is no data', () => {
-    render(<TableDataView tableData={{}} />);
+    render(<DataView tableData={{}} />);
     expect(screen.getByText('No compatible data')).toBeInTheDocument();
   });
 
@@ -22,7 +22,7 @@ describe('TableDataView', () => {
       column1: ['data1', 'data2'],
       undefined: ['data3', 'data4'],
     };
-    render(<TableDataView tableData={mockDataWithUndefined} />);
+    render(<DataView tableData={mockDataWithUndefined} />);
     expect(screen.getByText('data1')).toBeInTheDocument();
     expect(screen.getByText('data2')).toBeInTheDocument();
   });
@@ -32,7 +32,7 @@ describe('TableDataView', () => {
       column1: ['data1', 'data2'],
       column2: [],
     };
-    render(<TableDataView tableData={mockDataWithEmptyColumn} />);
+    render(<DataView tableData={mockDataWithEmptyColumn} />);
     expect(screen.getByText('data1')).toBeInTheDocument();
     expect(screen.getByText('data2')).toBeInTheDocument();
   });
@@ -42,7 +42,7 @@ describe('TableDataView', () => {
       column1: ['data1', 'data2'],
       column2: ['data3', 'data4'],
     };
-    render(<TableDataView tableData={mockData} />);
+    render(<DataView tableData={mockData} />);
     expect(screen.getByText('data1')).toBeInTheDocument();
     expect(screen.getByText('data2')).toBeInTheDocument();
     expect(screen.getByText('data3')).toBeInTheDocument();
@@ -54,7 +54,7 @@ describe('TableDataView', () => {
       column1: ['data1', 'data2'],
       column2: ['data3'],
     };
-    render(<TableDataView tableData={mockDataWithDifferentLengths} />);
+    render(<DataView tableData={mockDataWithDifferentLengths} />);
     expect(screen.getByText('data1')).toBeInTheDocument();
     expect(screen.getByText('data2')).toBeInTheDocument();
     expect(screen.getByText('data3')).toBeInTheDocument();
@@ -66,18 +66,18 @@ describe('TableDataView', () => {
       'Origin values': ['BD', 'HD'],
       'Origin total': [2260, 1865],
     };
-    render(<TableDataView tableData={mockData} />);
+    render(<DataView tableData={mockData} />);
     expect(screen.getByText('Origin values')).toBeInTheDocument();
     expect(screen.getByText('Origin total')).toBeInTheDocument();
   });
 
   it('should render data correctly when tableData prop is null', () => {
-    render(<TableDataView tableData={null} />);
+    render(<DataView tableData={null} />);
     expect(screen.getByText('No compatible data')).toBeInTheDocument();
   });
 
   it('should render data correctly when tableData prop is not provided', () => {
-    render(<TableDataView />);
+    render(<DataView />);
     expect(screen.getByText('No compatible data')).toBeInTheDocument();
   });
 
@@ -85,7 +85,7 @@ describe('TableDataView', () => {
     const mockData = {
       'Origin values': ['BD', 'HD'],
     };
-    render(<TableDataView tableData={mockData} />);
+    render(<DataView tableData={mockData} />);
     expect(screen.getByText('BD')).toBeInTheDocument();
     expect(screen.getByText('HD')).toBeInTheDocument();
   });
@@ -94,7 +94,7 @@ describe('TableDataView', () => {
     const mockData = {
       'Origin values': ['BD', ''],
     };
-    render(<TableDataView tableData={mockData} />);
+    render(<DataView tableData={mockData} />);
     expect(screen.getByText('BD')).toBeInTheDocument();
     // Ensure an empty cell doesn't throw an error
   });
@@ -103,7 +103,7 @@ describe('TableDataView', () => {
     const mockData = {
       'Origin values': ['BD', null],
     };
-    render(<TableDataView tableData={mockData} />);
+    render(<DataView tableData={mockData} />);
     expect(screen.getByText('BD')).toBeInTheDocument();
     // Ensure a null cell doesn't throw an error
   });
@@ -112,7 +112,7 @@ describe('TableDataView', () => {
     const mockData = {
       'Origin values': ['BD', null],
     };
-    const { container } = render(<TableDataView tableData={mockData} />);
+    const { container } = render(<DataView tableData={mockData} />);
     const modalElement = container.querySelector('.elastic-connector-view');
     expect(modalElement).toBeInTheDocument();
   });
@@ -121,14 +121,14 @@ describe('TableDataView', () => {
     const mockData = {
       'Origin values': ['BD', null],
     };
-    const { container } = render(<TableDataView tableData={mockData} />);
+    const { container } = render(<DataView tableData={mockData} />);
     const modalElement = container.querySelector('.dataview-table-header-cell');
     expect(modalElement).toBeInTheDocument();
   });
 
   it('should display no-data-message', () => {
     const mockData = '';
-    const { container } = render(<TableDataView tableData={mockData} />);
+    const { container } = render(<DataView tableData={mockData} />);
     const modalElement = container.querySelector('.no-data-message');
     expect(modalElement).toBeInTheDocument();
   });
