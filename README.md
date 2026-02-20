@@ -3,16 +3,16 @@
 [![Releases](https://img.shields.io/github/v/release/eea/volto-elastic-csv-widget)](https://github.com/eea/volto-elastic-csv-widget/releases)
 
 [![Pipeline](https://ci.eionet.europa.eu/buildStatus/icon?job=volto-addons%2Fvolto-elastic-csv-widget%2Fmaster&subject=master)](https://ci.eionet.europa.eu/view/Github/job/volto-addons/job/volto-elastic-csv-widget/job/master/display/redirect)
-[![Lines of Code](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-elastic-csv-widget-master&metric=ncloc)](https://sonarqube.eea.europa.eu/dashboard?id=volto-elastic-csv-widget-master)
-[![Coverage](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-elastic-csv-widget-master&metric=coverage)](https://sonarqube.eea.europa.eu/dashboard?id=volto-elastic-csv-widget-master)
-[![Bugs](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-elastic-csv-widget-master&metric=bugs)](https://sonarqube.eea.europa.eu/dashboard?id=volto-elastic-csv-widget-master)
-[![Duplicated Lines (%)](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-elastic-csv-widget-master&metric=duplicated_lines_density)](https://sonarqube.eea.europa.eu/dashboard?id=volto-elastic-csv-widget-master)
+[![Lines of Code](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-elastic-csv-widget&metric=ncloc)](https://sonarqube.eea.europa.eu/dashboard?id=volto-elastic-csv-widget)
+[![Coverage](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-elastic-csv-widget&metric=coverage)](https://sonarqube.eea.europa.eu/dashboard?id=volto-elastic-csv-widget)
+[![Bugs](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-elastic-csv-widget&metric=bugs)](https://sonarqube.eea.europa.eu/dashboard?id=volto-elastic-csv-widget)
+[![Duplicated Lines (%)](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-elastic-csv-widget&metric=duplicated_lines_density)](https://sonarqube.eea.europa.eu/dashboard?id=volto-elastic-csv-widget)
 
 [![Pipeline](https://ci.eionet.europa.eu/buildStatus/icon?job=volto-addons%2Fvolto-elastic-csv-widget%2Fdevelop&subject=develop)](https://ci.eionet.europa.eu/view/Github/job/volto-addons/job/volto-elastic-csv-widget/job/develop/display/redirect)
-[![Lines of Code](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-elastic-csv-widget-develop&metric=ncloc)](https://sonarqube.eea.europa.eu/dashboard?id=volto-elastic-csv-widget-develop)
-[![Coverage](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-elastic-csv-widget-develop&metric=coverage)](https://sonarqube.eea.europa.eu/dashboard?id=volto-elastic-csv-widget-develop)
-[![Bugs](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-elastic-csv-widget-develop&metric=bugs)](https://sonarqube.eea.europa.eu/dashboard?id=volto-elastic-csv-widget-develop)
-[![Duplicated Lines (%)](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-elastic-csv-widget-develop&metric=duplicated_lines_density)](https://sonarqube.eea.europa.eu/dashboard?id=volto-elastic-csv-widget-develop)
+[![Lines of Code](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-elastic-csv-widget&branch=develop&metric=ncloc)](https://sonarqube.eea.europa.eu/dashboard?id=volto-elastic-csv-widget&branch=develop)
+[![Coverage](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-elastic-csv-widget&branch=develop&metric=coverage)](https://sonarqube.eea.europa.eu/dashboard?id=volto-elastic-csv-widget&branch=develop)
+[![Bugs](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-elastic-csv-widget&branch=develop&metric=bugs)](https://sonarqube.eea.europa.eu/dashboard?id=volto-elastic-csv-widget&branch=develop)
+[![Duplicated Lines (%)](https://sonarqube.eea.europa.eu/api/project_badges/measure?project=volto-elastic-csv-widget&branch=develop&metric=duplicated_lines_density)](https://sonarqube.eea.europa.eu/dashboard?id=volto-elastic-csv-widget&branch=develop)
 
 
 [Volto](https://github.com/plone/volto) add-on
