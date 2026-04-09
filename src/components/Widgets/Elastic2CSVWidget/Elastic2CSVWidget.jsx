@@ -9,9 +9,10 @@ import isEqual from 'lodash/isEqual';
 
 import config from '@plone/volto/registry';
 
-import { FormFieldWrapper, InlineForm } from '@plone/volto/components';
+import FormFieldWrapper from '@plone/volto/components/manage/Widgets/FormFieldWrapper';
+import InlineForm from '@plone/volto/components/manage/Form/InlineForm';
 
-import { toPublicURL } from '@plone/volto/helpers';
+import { toPublicURL } from '@plone/volto/helpers/Url/Url';
 
 import {
   buildTableFromFields,
