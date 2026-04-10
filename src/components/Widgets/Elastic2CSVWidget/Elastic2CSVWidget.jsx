@@ -2,7 +2,7 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import { Button, Modal, Grid, Label } from 'semantic-ui-react';
-import { map } from 'lodash';
+import map from 'lodash/map';
 import axios from 'axios';
 
 import isEqual from 'lodash/isEqual';
