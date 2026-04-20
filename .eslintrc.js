@@ -48,6 +48,7 @@ const defaultConfig = {
     },
   },
   rules: {
+    'react/jsx-filename-extension': [1, { extensions: ['.js', '.jsx'] }],
     'react/jsx-no-target-blank': [
       'error',
       {

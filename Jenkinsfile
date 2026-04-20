@@ -13,7 +13,7 @@ pipeline {
     CURRENT_VOLTO = "18-yarn"
     PREVIOUS_VOLTO = "17"
     IMAGE_NAME = BUILD_TAG.toLowerCase()
-    }
+  }
 
   stages {
     stage('Release') {
@@ -89,7 +89,7 @@ pipeline {
             }
             steps {
               script {
-              fix_result = sh(script: '''docker run --name="$IMAGE_NAME-fix-current" --entrypoint=make --workdir=/app/src/addons/$GIT_NAME  $IMAGE_NAME-frontend-current ci-fix''', returnStatus: true)
+              fix_result = sh(script: '''docker run --name="$IMAGE_NAME-fix-current" --entrypoint=make --workdir=/app/src/addons/$GIT_NAME $IMAGE_NAME-frontend-current ci-fix''', returnStatus: true)
               sh '''docker cp $IMAGE_NAME-fix-current:/app/src/addons/$GIT_NAME/src .'''
               sh '''docker rm -v $IMAGE_NAME-fix-current'''
               FOUND_FIX = sh(script: '''git diff | wc -l''', returnStdout: true).trim()
@@ -119,16 +119,17 @@ pipeline {
           stage('Style lint') {
             when { environment name: 'SKIP_TESTS', value: '' }
             steps {
-              sh '''docker run --rm --name="$IMAGE_NAME-stylelint-current" --entrypoint=make --workdir=/app/src/addons/$GIT_NAME  $IMAGE_NAME-frontend-current stylelint'''
+              sh '''docker run --rm --name="$IMAGE_NAME-stylelint-current" --entrypoint=make --workdir=/app/src/addons/$GIT_NAME $IMAGE_NAME-frontend-current stylelint'''
             }
           }
 
           stage('Prettier') {
             when { environment name: 'SKIP_TESTS', value: '' }
             steps {
-              sh '''docker run --rm --name="$IMAGE_NAME-prettier-current" --entrypoint=make --workdir=/app/src/addons/$GIT_NAME  $IMAGE_NAME-frontend-current prettier'''
+              sh '''docker run --rm --name="$IMAGE_NAME-prettier-current" --entrypoint=make --workdir=/app/src/addons/$GIT_NAME $IMAGE_NAME-frontend-current prettier'''
             }
           }
+
           stage('Unit tests') {
               when { environment name: 'SKIP_TESTS', value: '' }
               steps {
@@ -157,13 +158,13 @@ pipeline {
                 }
               }
           }
-            
+
           stage('Integration tests') {
               when { environment name: 'SKIP_TESTS', value: '' }
               steps {
                 script {
                   try {
-                    sh '''docker run --pull always --rm -d --name="$IMAGE_NAME-plone-current" -e SITE="Plone" -e PROFILES="$BACKEND_PROFILES" -e ADDONS="$BACKEND_ADDONS" eeacms/plone-backend:6.0.13-15'''
+                    sh '''docker run --pull always --rm -d --name="$IMAGE_NAME-plone-current" -e SITE="Plone" -e PROFILES="$BACKEND_PROFILES" -e ADDONS="$BACKEND_ADDONS" eeacms/plone-backend'''
                     sh '''docker run -d --shm-size=4g --link $IMAGE_NAME-plone-current:plone --name="$IMAGE_NAME-cypress-current" -e "RAZZLE_INTERNAL_API_PATH=http://plone:8080/Plone" --entrypoint=make --workdir=/app/src/addons/$GIT_NAME $IMAGE_NAME-frontend-current start-ci'''
                     frontend = sh script:'''docker exec --workdir=/app/src/addons/${GIT_NAME} $IMAGE_NAME-cypress-current make check-ci''', returnStatus: true
                     if ( frontend != 0 ) {
@@ -260,7 +261,7 @@ pipeline {
         }
       }
 
-      stage('Volto 17') { 
+      stage('Volto 17') {
         agent { node { label 'integration'} }
         when {
           allOf {
@@ -355,10 +356,10 @@ pipeline {
           allOf {
             not { environment name: 'CHANGE_ID', value: '' }
             environment name: 'CHANGE_TARGET', value: 'develop'
-            environment name: 'SKIP_TESTS', value: '' 
+            environment name: 'SKIP_TESTS', value: ''
           }
           allOf {
-            environment name: 'SKIP_TESTS', value: '' 
+            environment name: 'SKIP_TESTS', value: ''
             environment name: 'CHANGE_ID', value: ''
             branch 'develop'
             not { changelog '.*^Automated release [0-9\\.]+$' }
