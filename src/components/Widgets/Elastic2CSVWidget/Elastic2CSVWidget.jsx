@@ -2,16 +2,17 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import { Button, Modal, Grid, Label } from 'semantic-ui-react';
-import { map } from 'lodash';
+import map from 'lodash/map';
 import axios from 'axios';
 
 import isEqual from 'lodash/isEqual';
 
 import config from '@plone/volto/registry';
 
-import { FormFieldWrapper, InlineForm } from '@plone/volto/components';
+import FormFieldWrapper from '@plone/volto/components/manage/Widgets/FormFieldWrapper';
+import InlineForm from '@plone/volto/components/manage/Form/InlineForm';
 
-import { toPublicURL } from '@plone/volto/helpers';
+import { toPublicURL } from '@plone/volto/helpers/Url/Url';
 
 import {
   buildTableFromFields,
