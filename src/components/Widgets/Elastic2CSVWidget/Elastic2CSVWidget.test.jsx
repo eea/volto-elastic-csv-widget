@@ -1,18 +1,20 @@
 import React from 'react';
 import { render, waitFor, fireEvent } from '@testing-library/react';
-import '@testing-library/jest-dom/extend-expect';
+import '@testing-library/jest-dom';
 import { IntlProvider } from 'react-intl';
 
 import Elastic2CSVWidget from './Elastic2CSVWidget';
 
-jest.mock('@plone/volto/components', () => ({
-  FormFieldWrapper: jest.fn(({ children }) => <>{children}</>),
-  InlineForm: jest.fn(() => <div>Mocked InlineForm</div>),
-}));
+jest.mock('@plone/volto/components/manage/Widgets/FormFieldWrapper', () =>
+  jest.fn(({ children }) => <>{children}</>),
+);
+jest.mock('@plone/volto/components/manage/Form/InlineForm', () =>
+  jest.fn(() => <div>Mocked InlineForm</div>),
+);
 
 global.__DEVELOPMENT__ = true;
 process.env.RAZZLE_PROXY_QA_DSN_globalsearch = 'http://my.endpoint.com';
-jest.mock('@plone/volto/helpers', () => ({
+jest.mock('@plone/volto/helpers/Url/Url', () => ({
   toPublicURL: jest.fn(() => 'http://my.endpoint.com'),
 }));
 
